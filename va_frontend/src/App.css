@@ -1,0 +1,24 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh; /* Full height of the viewport */
+  width: 100%; /* Full width of the viewport */
+}
+
+.side-nav {
+  width: 200px; /* Fixed width for the navigation bar */
+  height: 100%; /* Full height of the viewport */
+  border-right: 1px solid black;
+}
+
+.main-content {
+  flex-grow: 1; /* Allow the main content to grow and fill available space */
+  padding: 10px;
+  overflow: auto; /* Enable scrolling for overflowing content */
+}

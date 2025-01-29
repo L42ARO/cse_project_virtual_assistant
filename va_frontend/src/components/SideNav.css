@@ -1,0 +1,37 @@
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Push the button to the bottom */
+  height: 100vh; /* Full height of the viewport */
+  width: 200px; /* Fixed width for the side navigation */
+  padding: 0;
+  border-right: 1px solid black;
+  box-sizing: border-box; /* Include padding/border in height calculations */
+}
+
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+}
+
+.nav-links li {
+  margin-bottom: 10px;
+}
+
+.nav-bottom {
+  padding: 10px;
+  text-align: center; /* Center-align the button */
+}
+
+.nav-bottom button {
+  width: 100%; /* Make the button span the container */
+  padding: 5px;
+  cursor: pointer;
+}
+
+
+.nav-bottom a {
+  text-decoration: none; /* Remove link underline */
+  color: inherit; /* Inherit text color */
+}
