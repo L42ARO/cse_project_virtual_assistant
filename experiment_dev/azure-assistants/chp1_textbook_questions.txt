@@ -1,0 +1,26 @@
+Problem 1.22: A space explorer sets off at a steady v = 0.95c to a distant star, AFter exploring the star for a shrot time he returns at the same speed and gets home after a total absence of 80 years (as measured by earth observers). How long do his clocks say that he was gone and by how much has he aged?
+Note: This is the twin paradox discussed in Example 1.3. It is easy to get the right answer by judicious insertion of factor y in the right place, but to understand the restult you need to recognize that it involves three inertial frames: the earthbound frame S, the frame S', of the outward boutnd rocket, and the frame S'' of the returning rocket. You can wirte down the time dilation formula for each of the 2 halves of the journy and add these to give the desired relation (Notice that the experiment is not symmetrical between the explorer and his friends who stay behind on earth the earthbound clocks stay at rest in a single interial frame, but the rocket's clock and crew occupy at least 2 different frames, That is waht allows the result to be unsymmetrical
+
+Problem 1.26: A group of Pi Mensons (pions) is observed traveling at speed 0.8c in a particle-physics laboratory.
+(a) what is the factor gamma for the pions?
+(b) if the pions proper half life is 1.8x10^-8 seconds, what is their half life as observed in the lab frame?
+(c) if there were initially 32,000 pions, how many will be left after they have traveled 36m
+(d) what would be the answer to (c) if one ignored time dilation
+
+Problem 1.32: Consider the experiment of the previous problem, from the point of view of the Pions rest frame, In part (c) how far (as seen by the pions) does the laboratory move, and how long does this take? How many pions remain at the end of this time?
+
+Problem 1.33: A meter stick is moving with speed 0.8c relative to the frame S
+(a) what is the stick's length as measured by observers in S, if the stick is parallel to it's velocity v?
+(b) what if the stick is prependicular to v?
+(c) what if the stick is at 60degrees to v? as seen in the stick's rest frame. Hint: You can imagine that the meter stick is the hypotenuse of a 30-60-90 triangle of plywood
+(d) what if the stick is at 60 degrees to v as measured in S
+
+Problem 1.34: Like time dilation, the Lorentz contraction cannot be seen directly (that is, perceived by the normal process of vision). To understand this claim consider a long of proper length L_0 moving relative to S. Careful mesaurements made by observers in S will show that the rod has the contracted length L = L_0/gamma. But now consider what is seen by observer Q in the figure (with Q to the right of points A and B. What Q sees at any one instant is determiend by the light entering her eyes at that instant. Now consider the light reaching Q at one instant from the front and back of the rod.
+(a) Explain why these 2 rays must have left the rod from points A and B at different times. If the x axis has a graudated scale as shows Q sees (and a photograph would record) a rod extendign from A to B; that is Q sees a rod of length AB
+(b) prove that Q sees a rod that is longer than L (In fact at certain speeds it is even seen to be longer than L_0, and the Lorentz contrction is distorted into an expansion)
+(c) prove that once it passed her Q will see the rod to be shorter than L
+
+Problem 1.42: A traveler in a rocket of length 2d sets up a coordinate system S' with an origin O' anchored at the exact middle of the rocket and x' axis along the rocket's length. At t'=0 she ignites a flashbulb at O'
+a) write down the coordinates x'f, t'f, and x'b, t'b for the arrival of the lgiht at the front and back of the rocket
+b) now consider the same experiment as observed in a frame S relative to which the rocket is traveling at speed v (with S and S' arranged in the standard configuration). Use the lorentz transformations to find the coordinates xf, tf, and xb, tb of the arrival of the 2 singlas, Explain clearly why the 2 times are not equal in frame S, alghough they were in S' (This illustrates how 2 events that are simulatnous in S' are not necessarily simultaneous in S)
+
