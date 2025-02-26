@@ -11,7 +11,7 @@ from flask_cors import CORS
 from controllers import admin_controller
 from controllers import users_controller
 from controllers import student_chat_controller
-from controllers import professor_chat_controler
+from controllers import professor_chat_controller
 from controllers import api_example_controller
 
 def create_app():
@@ -27,14 +27,14 @@ def create_app():
     app.register_blueprint(admin_controller.bp)
     app.register_blueprint(users_controller.bp)
     app.register_blueprint(student_chat_controller.bp)
-    app.register_blueprint(professor_chat_controler.bp)
+    app.register_blueprint(professor_chat_controller.bp)
 
     # Register Socket.IO events
     admin_controller.register_socketio_events(socketio)
     users_controller.register_socketio_events(socketio)
     student_chat_controller.register_socketio_events(socketio)
     api_example_controller.register_socketio_events(socketio)
-    professor_chat_controler.register_socketio_events(socketio)
+    professor_chat_controller.register_socketio_events(socketio)
 
     return app, socketio
 
