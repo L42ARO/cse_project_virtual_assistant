@@ -1,0 +1,29 @@
+[Relativistic Energy and Momentum
+- Newtonian mechanics: p = mv, KE = ½mv².
+- Relativistic momentum: p = γmv (where γ = 1 / sqrt(1 - v²/c²)).
+- Kinetic energy increases drastically near c.
+]
+---
+[E = mc²: Mass-Energy Equivalence
+- Mass is a form of energy.
+- Small amounts of mass release huge energy (nuclear reactions).
+- Example: Nuclear fission in atomic bombs.
+]
+---
+[Relativistic Doppler Effect
+- Light changes frequency due to relative motion.
+- Formula: f' = f sqrt((1 - v/c) / (1 + v/c)).
+- Applications: Redshift in astronomy.
+]
+---
+[Spacetime Diagrams
+- Time and space form a single entity: spacetime.
+- Events are points in spacetime.
+- Light cone: Defines causality.
+]
+---
+[Applications of Special Relativity
+- GPS satellites need relativistic corrections.
+- Particle accelerators rely on relativistic mass increase.
+- Astrophysical objects (black holes, neutron stars) obey relativistic laws.
+]

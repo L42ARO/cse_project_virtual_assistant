@@ -28,8 +28,8 @@ client = AzureOpenAI(
 
 #Prepare the chat prompt 
 chat_prompt = [
-     {"role": "system", "content": "You are a virtual assistant for a professor teaching english The syllabus for this semester is the followig: Week 1: English Verbs, Week 2: English literature, Week 3: English Pronunciation, Week 4: English Spelling, Week 5: Writing in english."},
-        {"role": "user", "content": "Hi, what is the content we will see on week 4"}
+    {"role": "system", "content": "You are a virtual assistant for a professor teaching english The syllabus for this semester is the followig: Week 1: English Verbs, Week 2: English literature, Week 3: English Pronunciation, Week 4: English Spelling, Week 5: Writing in english."},
+    {"role": "user", "content": "Hi, what is the content we will see on week 4"}
 ] 
     
 # Include speech result if speech is enabled  

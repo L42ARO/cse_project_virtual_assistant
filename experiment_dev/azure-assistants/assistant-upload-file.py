@@ -29,7 +29,20 @@ client = AzureOpenAI(
 vector_store = client.beta.vector_stores.create(name=course_id+"-files")
  
 # Ready the files for upload to OpenAI
-file_paths = ["sample_syllabus.pdf", "hw1.pdf", "chp1_textbook_questions.txt"]
+file_paths = [
+  "sample_syllabus.pdf", 
+  "hw1.pdf",
+  "chp1_textbook_questions.txt",
+  "Lectures/Lecture_1.txt",
+  "Lectures/Lecture_2.txt",
+  "Lectures/Lecture_3.txt",
+  "Lectures/Lecture_4.txt",
+  "Lectures/Lecture_5.txt",
+  "Lectures/Lecture_7.txt",
+  "Lectures/Lecture_8.txt",
+  "Lectures/Lecture_9.txt",
+  "Lectures/Lecture_10.txt"
+  ]
 file_streams = [open(path, "rb") for path in file_paths]
  
 # Use the upload and poll SDK helper to upload the files, add them to the vector store,

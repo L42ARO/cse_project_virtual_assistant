@@ -1,0 +1,23 @@
+[Bohr’s Model of the Atom
+- Electrons orbit in quantized energy levels.
+- No radiation emitted unless electrons jump between levels.
+]
+---
+[Spectral Lines
+- Atoms absorb and emit specific wavelengths of light.
+- Explained by quantized energy levels.
+]
+---
+[Limitations of the Bohr Model
+- Only works for hydrogen.
+- Fails for multi-electron atoms.
+]
+---
+[Wave-Particle Duality
+- Light exhibits both wave and particle properties.
+- Introduced by Einstein and de Broglie.
+]
+---
+[Introduction to Quantum Mechanics
+- Quantum mechanics replaces classical mechanics at small scales.
+]

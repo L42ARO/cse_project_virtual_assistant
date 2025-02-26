@@ -1,0 +1,34 @@
+[Introduction to Special Relativity
+- Classical physics assumes space and time are absolute.
+- In the 19th century, Newtonian mechanics was the standard model.
+- The discovery of electromagnetism hinted at inconsistencies in classical mechanics.
+- The need for a new framework arose from experimental observations.
+]
+---
+[Postulates of Special Relativity
+- Albert Einstein proposed two fundamental postulates:
+  1. The laws of physics are the same in all inertial reference frames.
+  2. The speed of light in a vacuum is constant, regardless of the observer's motion.
+- These postulates contradict classical notions of absolute space and time.
+]
+---
+[Galilean Relativity and Its Limitations
+- Galileo's principle of relativity states that motion is relative; physics is the same in all inertial frames.
+- Galilean transformations assume absolute time and space, leading to incorrect predictions for light.
+- Example: If a train moves at 100 km/h and a person inside throws a ball at 10 km/h, an outside observer sees 110 km/h.
+- But this logic fails for light, as experiments show its speed remains unchanged.
+]
+---
+[The Michelson-Morley Experiment
+- Designed to detect the motion of Earth through a supposed 'luminiferous ether'.
+- Used an interferometer to measure differences in light speed in different directions.
+- Result: No difference detected, contradicting the ether hypothesis.
+- This result laid the foundation for Einstein’s special relativity.
+]
+---
+[Implications for the Nature of Space and Time
+- If the speed of light is constant, then time and space must be relative.
+- Leads to effects like time dilation and length contraction.
+- The nature of simultaneity is no longer absolute.
+- Introduces the concept of spacetime as a unified entity.
+]

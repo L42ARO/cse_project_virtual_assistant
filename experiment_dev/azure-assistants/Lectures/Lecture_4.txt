@@ -1,0 +1,26 @@
+[Lorentz Transformations
+- Equations linking space and time in different frames.
+- Derived from Einstein’s postulates.
+- Affect time, length, and simultaneity.
+]
+---
+[Relativity of Simultaneity
+- Two observers moving relative to each other do not agree on simultaneous events.
+- Example: Train and lightning strike experiment.
+]
+---
+[Energy and Momentum Conservation
+- Even in relativity, total energy and momentum remain conserved.
+- Need to use relativistic definitions.
+]
+---
+[Causality and the Speed of Light
+- No information can travel faster than light.
+- Violating this would allow time travel and paradoxes.
+]
+---
+[Impact on Modern Physics
+- Laid foundation for general relativity.
+- Essential for understanding the universe.
+- Enables technologies like nuclear power and particle accelerators.
+]

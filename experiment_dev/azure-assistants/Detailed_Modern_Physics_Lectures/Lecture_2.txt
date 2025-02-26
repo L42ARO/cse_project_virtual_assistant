@@ -1,0 +1,29 @@
+[Time Dilation: The Relativistic Clock
+- Moving clocks run slower compared to stationary ones.
+- Derived from the light clock thought experiment.
+- Mathematical formula: Δt' = Δt / sqrt(1 - v²/c²).
+- Validated by experiments with high-speed particles.
+]
+---
+[Length Contraction: The Moving Rod
+- Objects in motion appear shorter along the direction of motion.
+- Formula: L' = L * sqrt(1 - v²/c²).
+- This effect only becomes noticeable at high velocities.
+]
+---
+[Relativistic Velocity Transformations
+- Unlike classical mechanics, velocities do not simply add.
+- Einstein's velocity addition formula: u' = (u + v) / (1 + uv/c²).
+- Ensures that no object surpasses the speed of light.
+]
+---
+[Twin Paradox: A Thought Experiment
+- One twin travels near light speed, the other stays on Earth.
+- Upon return, the traveling twin is younger.
+- Resolves via acceleration breaking symmetry in reference frames.
+]
+---
+[Experimental Evidence of Time Dilation
+- Muon decay experiments confirm time dilation.
+- GPS satellites must correct for relativistic effects to maintain accuracy.
+]

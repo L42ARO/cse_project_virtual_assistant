@@ -1,0 +1,13 @@
+[Quantum Measurement and Superposition
+- Measurement collapses a quantum state.
+- Copenhagen interpretation.
+]
+---
+[Quantum Entanglement
+- Particles can be linked across distances.
+- Bell’s theorem: No hidden variables.
+]
+---
+[Future of Quantum Mechanics
+- Quantum computing, teleportation, new physics.
+]

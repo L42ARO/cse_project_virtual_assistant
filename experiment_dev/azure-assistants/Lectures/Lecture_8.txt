@@ -1,0 +1,23 @@
+[Solving the Schrödinger Equation
+- Solutions give allowed energy levels.
+- Example: Particle in a box problem.
+]
+---
+[Quantum States and Quantum Numbers
+- Describe properties of electrons in atoms.
+- Principal, angular, magnetic, and spin quantum numbers.
+]
+---
+[The Hydrogen Atom
+- First system solved with quantum mechanics.
+- Explains atomic spectra.
+]
+---
+[Quantum Mechanics vs. Classical Mechanics
+- Classical: Deterministic, continuous.
+- Quantum: Probabilistic, discrete.
+]
+---
+[Applications in Modern Technology
+- Lasers, semiconductors, quantum computing.
+]

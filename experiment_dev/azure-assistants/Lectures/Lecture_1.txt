@@ -1,0 +1,34 @@
+[Introduction to Special Relativity
+- Classical physics assumes absolute space and time.
+- Newtonian mechanics explains everyday motion but fails at high speeds.
+- The need for a new theory arose from inconsistencies in electromagnetism and mechanics.
+- Special relativity fundamentally changes our understanding of time, space, and motion.
+]
+---
+[Postulates of Special Relativity
+- Einstein’s two postulates:
+  1. The laws of physics are the same in all inertial frames.
+  2. The speed of light (c) is constant in all reference frames.
+- These postulates challenge classical notions of time and space.
+- Implications: No absolute rest frame, simultaneity is relative.
+]
+---
+[Galilean Relativity and Its Limitations
+- In classical mechanics, velocities add linearly: v_total = v1 + v2.
+- This fails for light: Experiments show c is always constant.
+- Example: A moving flashlight should add velocity to light, but it does not.
+]
+---
+[The Michelson-Morley Experiment
+- Attempted to measure Earth's motion through the ether.
+- Used an interferometer to detect differences in light speed in different directions.
+- Found no difference → The ether hypothesis was incorrect.
+- This result led Einstein to propose special relativity.
+]
+---
+[Consequences of Special Relativity
+- Space and time are not absolute but relative.
+- Time dilation: Moving clocks run slower.
+- Length contraction: Moving objects shrink in their direction of motion.
+- Mass-energy equivalence: E = mc².
+]

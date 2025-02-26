@@ -1,0 +1,14 @@
+[Spin and Quantum Mechanics
+- Electrons have intrinsic angular momentum.
+- Two states: Spin-up and spin-down.
+]
+---
+[Pauli Exclusion Principle
+- No two electrons can have the same quantum numbers.
+- Explains atomic structure and periodic table.
+]
+---
+[Quantum Superposition
+- Particles exist in multiple states until measured.
+- Basis for quantum computing.
+]

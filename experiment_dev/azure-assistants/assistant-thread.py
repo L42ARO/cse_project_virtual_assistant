@@ -23,9 +23,10 @@ client = AzureOpenAI(
 )
 
 
-vs_id = "vs_lgrVwcW8AAbOX3QCFzySgWXC"
+# vs_id = "vs_lgrVwcW8AAbOX3QCFzySgWXC"
+vs_id = "vs_2MJjh2IcJ1ebI6Lu1z4B6gfq"
 assistant_id = "asst_QAA9ERdqNke90WjtS9iN0PI7"
-question = "Based on the general topics from the questions on Homework 1, which objectives would I be completing as outlined in the syllabus? List them for each question max 5 words per bullpoint"
+question = "Based on the questions on Homework 1, which lectures should I study?"
 
 thread = client.beta.threads.create(
   messages=[ { "role": "user", "content": question} ],

@@ -1,0 +1,29 @@
+[Time Dilation
+- Moving observers experience time at a slower rate.
+- Light clock thought experiment: A clock moving at speed v ticks slower.
+- Formula: Δt' = Δt / sqrt(1 - v²/c²).
+- Verified by fast-moving particles (muons) and GPS satellites.
+]
+---
+[Length Contraction
+- Objects moving at high speeds shrink along their direction of motion.
+- Formula: L' = L * sqrt(1 - v²/c²).
+- Only significant at speeds close to c.
+]
+---
+[Relativistic Velocity Addition
+- Unlike classical physics, velocities do not add normally.
+- Formula: u' = (u + v) / (1 + uv/c²).
+- Ensures nothing exceeds the speed of light.
+]
+---
+[Twin Paradox
+- One twin travels at near-light speed, the other stays on Earth.
+- The traveling twin ages slower and returns younger.
+- Resolved by noting the traveler undergoes acceleration, breaking symmetry.
+]
+---
+[Experimental Proofs of Relativity
+- Muon decay: Muons live longer when moving at high speeds.
+- GPS: Needs relativistic corrections to maintain accuracy.
+]

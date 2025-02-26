@@ -1,0 +1,26 @@
+[Discovery of the Atom
+- Ancient Greek ideas: Atoms are indivisible.
+- Dalton’s atomic theory (1803): Atoms form chemical compounds.
+- Discovery of the electron (J.J. Thomson, 1897).
+]
+---
+[Thomson’s Plum Pudding Model
+- Atoms were thought to be a "sea" of positive charge with embedded electrons.
+- This model was disproven by Rutherford’s experiment.
+]
+---
+[Rutherford’s Gold Foil Experiment
+- Shot alpha particles at a thin gold foil.
+- Most passed through, but some deflected sharply.
+- Conclusion: Atoms have a small, dense nucleus.
+]
+---
+[Limitations of Classical Models
+- Classical physics predicted electrons would spiral into the nucleus.
+- Needed a new theory: Quantum mechanics.
+]
+---
+[Introduction to Quantum Ideas
+- Energy levels must be quantized.
+- Light behaves as both a particle and a wave.
+]

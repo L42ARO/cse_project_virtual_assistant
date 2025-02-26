@@ -1,0 +1,23 @@
+[Wave-Particle Duality
+- Double-slit experiment: Particles create interference patterns.
+- de Broglie: Matter waves exist for all particles.
+]
+---
+[Heisenberg’s Uncertainty Principle
+- Cannot precisely measure both position and momentum.
+- Formula: Δx Δp ≥ h/4π.
+]
+---
+[Wavefunctions and Probability
+- Schrödinger equation describes quantum states.
+- Probability of finding a particle given by |ψ|².
+]
+---
+[Quantum Tunneling
+- Particles can pass through energy barriers.
+- Used in modern electronics (transistors, STM).
+]
+---
+[Introduction to Schrödinger’s Equation
+- Fundamental equation of quantum mechanics.
+]
