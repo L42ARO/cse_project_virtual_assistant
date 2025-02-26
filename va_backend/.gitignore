@@ -1,1 +1,12 @@
-/venv
+# Ignore virtual environment
+venv/
+
+__pycache__/
+*.pyc
+
+# Ignore environment variables (if any)
+.env
+*.env
+
+# Ignore uploads and generated files
+uploads/
