@@ -1,0 +1,131 @@
+/* Main container */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: #EFEFEF;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 20%;
+    background-color: #E6E8E6;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .sidebar-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+  }
+  
+  /* Navigation Menu */
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .nav-item {
+    font-size: 16px;
+    color: #000;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .nav-item:hover {
+    background-color: #475841;
+    color: white;
+  }
+  
+  /* Logout Button */
+  .logout-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #000;
+    margin-top: auto;
+  }
+  
+  .logout-button:hover {
+    text-decoration: underline;
+  }
+  
+  /* Main Content */
+  .main-content {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Header */
+  .header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #000;
+  }
+  
+  .course-dropdown {
+    font-size: 16px;
+    cursor: pointer;
+    color: #3F403F;
+  }
+  
+  /* Chat Box */
+  .chat-box {
+    width: 90%;
+    height: 60vh;
+    background-color: #E6E8E6;
+    border-radius: 10px;
+    border: 1px solid #475841;
+    margin-top: 20px;
+  }
+  
+  /* Input Box */
+  .input-container {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    margin-top: 10px;
+  }
+  
+  .chat-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #475841;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+  
+  /* Upload Button */
+  .upload-button {
+    background-color: white;
+    border: 1px solid #475841;
+    border-radius: 10px;
+    padding: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .upload-button:hover {
+    background-color: #475841;
+    color: white;
+  }
+  
