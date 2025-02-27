@@ -34,8 +34,8 @@ def new_course():
         timestamp = datetime.now(timezone.utc).isoformat()
 
         # Emit WebSocket events
-        socketio.emit("ws_course_res", {"message": course_request.initial_message, "timestamp": timestamp})
-        socketio.emit("ws_course_reply", {"message": "This is a reply to an initial course message", "timestamp": timestamp})
+        socketio.emit("ws_user_res", {"message": course_request.initial_message, "timestamp": timestamp})
+        socketio.emit("ws_ai_res", {"message": "Hi please tell me more about my role as your assistant for CDA3103, Feel free to provide more instructions on the specific questions I should answer, or upload more class materials", "timestamp": timestamp})
 
         return http_response("Course created successfully", 200, data={"course_id": course_id})
 

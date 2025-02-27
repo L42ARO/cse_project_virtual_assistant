@@ -14,8 +14,8 @@ const routesList = [
   { url: "/ui/login", comp: <LoginForm /> },
   { url: "/ui/chat", comp: <StudentChat />, alias: "Student Chat" },
   { url: "/ui/professor-dashboard", comp: <ProfessorDashboard />, alias: "Professor Dashboard" },
-  { url: "/ui/professor-files", comp: <ProfessorFiles />, alias: "Professor Files" },
-  { url: "/ui/chat-testing", comp: <ProfessorChatTesting />, alias: "Professor Chat Testing" },
+  // { url: "/ui/professor-files", comp: <ProfessorFiles />, alias: "Professor Files" },
+  // { url: "/ui/chat-testing", comp: <ProfessorChatTesting />, alias: "Professor Chat Testing" },
  { url: "/ui/api-example", comp: <APIUsageExample />, alias: "API Example" },
 ];
 
