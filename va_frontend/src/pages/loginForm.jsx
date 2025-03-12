@@ -12,12 +12,6 @@ function LoginForm(){
             <input type="password" placeholder="Password" className="input-box" />
             <button className="sign-in-button">Sign in</button>
             </div>
-
-            {/* Right Panel - Sign Up */}
-            <div className="right-panel">
-            <p>Don’t have an account?</p>
-            <button className="sign-up-button">Sign up</button>
-            </div>
         </div>
     );
 }
