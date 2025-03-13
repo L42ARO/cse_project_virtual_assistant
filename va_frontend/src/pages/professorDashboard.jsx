@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./professorDashboard.css";
@@ -12,6 +12,15 @@ function ProfessorDashboard() {
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [courseId, setCourseId] = useState(null);
 
+    const fileInputRef = useRef(null);
+
+    // Handle file selection
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        alert(`File "${file.name}" uploaded successfully! (Simulated)`);
+      }
+    };
     // Handles sending the first message
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
@@ -113,11 +122,28 @@ function ProfessorDashboard() {
                         onChange={(e) => setChatInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                    <button className="upload-button">⬆️</button>
+                    {/* Hidden file input */}
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      style={{ display: 'none' }} 
+                      onChange={handleFileUpload} 
+                    />
+
+                    {/* Upload Button */}
+                    <button 
+                      className="upload-button" 
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      ⬆️
+                    </button>
+                    {/* <button className="upload-button">⬆️</button> */}
                 </div>
             </div>
         </div>
     );
 }
 
+
 export default ProfessorDashboard;
+

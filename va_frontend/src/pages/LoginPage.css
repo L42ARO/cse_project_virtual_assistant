@@ -10,53 +10,73 @@ body {
 /* General Container */
 .login-container {
   display: flex;
+  justify-content: center; /* Center the panel */
+  align-items: center; /* Vertically center */
   height: 100vh;
   width: 100%;
-  font-family: 'Roboto', sans-serif;
+  background-color: #EFEFEF; /* Light gray */
 }
 
 /* Left Panel (Sign In) */
 .left-panel {
-  flex: 1;
-  background-color: #EFEFEF; /* Light gray */
+  width: 400px; /* Set a fixed width */
+  background-color: #FFFFFF; /* White background */
   padding: 50px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  align-items: flex-start; /* Align everything to the left */
 }
 
+/* Title */
 .left-panel h1 {
   font-size: 24px;
   font-weight: 700;
   color: #000000; /* Black */
   margin-bottom: 20px;
+  align-self: center; /* Keep title centered */
 }
 
+/* Label and Input Container */
+.label-input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align everything to the left */
+}
+
+/* Labels */
 .left-panel label {
   font-size: 14px;
   font-weight: 500;
   color: #000000; /* Black */
   margin-top: 10px;
+  margin-bottom: 5px; /* Spacing between label and input */
+  width: 100%; /* Ensure labels take up the full width */
+  text-align: left; /* Force text alignment */
+  display: block; /* Ensure block-level consistency */
+  box-sizing: border-box; /* Fix width issues */
 }
 
+/* Input Boxes */
 .input-box {
   width: 100%;
-  max-width: 300px;
+  max-width: 100%; /* Ensure inputs match label width */
   padding: 10px;
-  margin-top: 5px;
   border: none;
   border-radius: 5px;
   background-color: #CED0CE; /* Medium gray */
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
+  box-sizing: border-box; /* Ensure consistent sizing */
 }
 
 /* Sign-in Button */
 .sign-in-button {
   width: 100%;
-  max-width: 300px;
-  padding: 10px;
+  max-width: 100%;
+  padding: 12px;
   margin-top: 20px;
   border: none;
   border-radius: 5px;
@@ -69,41 +89,4 @@ body {
 
 .sign-in-button:hover {
   background-color: #333E2F; /* Slightly darker green */
-}
-
-/* Right Panel (Sign Up) */
-.right-panel {
-  flex: 1;
-  background-color: #475841; /* Dark green */
-  color: white;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.right-panel p {
-  font-size: 14px;
-  font-weight: 400;
-  color: #FFFFFF; /* White */
-  margin-bottom: 10px;
-}
-
-/* Sign-up Button */
-.sign-up-button {
-  padding: 10px 20px;
-  border: 1px solid #FFFFFF; /* White border */
-  border-radius: 5px;
-  background: transparent;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.sign-up-button:hover {
-  background-color: #FFFFFF; /* White */
-  color: #475841; /* Dark green */
 }
