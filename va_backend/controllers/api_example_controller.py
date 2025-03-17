@@ -12,6 +12,7 @@ def simple_http():
     """Returns a simple JSON response."""
     return jsonify({"message": "This is an immediate HTTP response"})
 
+
 @bp.route('/delayed-http')
 def delayed_http():
     """Triggers a response that sends a message word-by-word over WebSocket."""

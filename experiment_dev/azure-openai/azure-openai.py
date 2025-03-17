@@ -1,4 +1,3 @@
-
 import os  
 import base64
 from openai import AzureOpenAI  
@@ -48,5 +47,5 @@ completion = client.chat.completions.create(
     stream=False
 )
 
-print(completion.to_json())  
+print(completion.choices[0].message.content)
     

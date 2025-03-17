@@ -23,15 +23,15 @@ class OpenAIService:
         )
         self.threads = {}
 
-    def InitializeThread(self, assistant_id, vs_id, init_message):
+    def InitializeThread(self, assistant_id, vs_id, init_message=""):
 
         thread = self.client.beta.threads.create(
-            messages=[{"role": "user", "content": init_message}],
+            # messages=[{"role": "user", "content": init_message}],
             tool_resources={"file_search": {"vector_store_ids": [vs_id]}},
         )
         self.threads[thread.id] = {
             "assistant_id": assistant_id,
-            "messages": [{"role": "user", "content": init_message}],
+            # "messages": [{"role": "user", "content": init_message}],
         }
         return thread.id
 
@@ -46,7 +46,7 @@ class OpenAIService:
             
         @override
         def on_text_created(self, text) -> None:
-            print(f"\nassistant > ", end="", flush=True)
+            print(f"\nassistant > {text}", end="", flush=True)
 
         @override
         def on_tool_call_created(self, tool_call):
@@ -102,8 +102,7 @@ if __name__ == "__main__":
     thread_id = openai_service.InitializeThread(
         assistant_id, 
         vs_id, 
-
-        "What are the key objectives covered in Homework 1?"
+        "What are the qeustions in Homework 1?"
     )
     print(f"✅ Thread initialized with ID: {thread_id}")
 

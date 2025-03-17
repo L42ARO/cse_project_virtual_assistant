@@ -102,6 +102,19 @@ export const useAPI = () => {
     socket.emit("send_chat", payload);
   };
 
+  const studentChatMessage = (socket,message) => {
+    if (!socket) {
+      console.error("Socket is not available to send the chat message.");
+      return;
+    }
+
+    // Standardized message format
+    const payload = { message: message.trim(), session_id: session_id.trim()};
+
+    // Emit the event to the server
+    socket.emit("student_chat_msg", payload);
+  }
+
   return {
     fetchHttpMessage,
     fetchDelayedHttpMessage,
