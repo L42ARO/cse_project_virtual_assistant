@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify
 
 # Create a Blueprint
 bp = Blueprint("users_controller", __name__)
+prefix = "/uc"
 
 # Dummy users list
 dummy_users = [
