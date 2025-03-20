@@ -69,16 +69,6 @@
   color: #3F403F;
 }
 
-/* Chat Box */
-.student-chat-box {
-  width: 90%;
-  height: 60vh;
-  background-color: #E6E8E6;
-  border-radius: 10px;
-  border: 1px solid #475841;
-  margin-top: 20px;
-}
-
 /* Input Box (Updated to Match Professor Dashboard) */
 .student-input-container {
   display: flex;
@@ -95,24 +85,78 @@
   font-size: 16px;
 }
 
-/* Upload Button */
-.student-upload-button {
-  background-color: white;
-  border: 1px solid #475841;
-  border-radius: 10px;
-  padding: 10px;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.student-upload-button:hover {
-  background-color: #475841;
-  color: white;
-}
-
 /* Right Sidebar (Flagged Questions) */
 .student-right-sidebar {
   width: 20%;
   background-color: #E6E8E6;
   padding: 20px;
+}
+
+/* Chat Box */
+.student-chat-box {
+  width: 90%;
+  height: 60vh;
+  background-color: #E6E8E6;
+  border-radius: 10px;
+  border: 1px solid #475841;
+  margin-top: 20px;
+  position: relative; 
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.student-chat-message {
+  display: flex;
+  width: 100%;
+  margin: 1px 0;
+}
+
+.student-chat-message.User {
+  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.student-chat-message.User .student-message-bubble {
+  background-color: #475841;
+  color: white;
+  text-align: left;
+  max-width: 50%;
+  width: auto;
+  padding: 10px;
+  border-radius: 18px;
+  margin: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: inline-block;
+  white-space: normal;
+}
+
+.student-chat-message.AI{
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sstudent-chat-message.AI .student-message-bubble {
+  background-color: #475841;
+  color: white;
+  max-width: 50%;
+  width: auto;
+  text-align: left;
+  padding: 10px;
+  border-radius: 18px;
+  margin: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: inline-block;
+  white-space: normal;
+}
+
+.student-sender-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #3F403F;
 }
