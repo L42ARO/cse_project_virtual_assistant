@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./professorDashboard.css";
+import CourseDropdown from "../components/CourseDropdown";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
@@ -11,8 +12,11 @@ function ProfessorDashboard() {
     const [chatInput, setChatInput] = useState("");
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [courseId, setCourseId] = useState(null);
+    const [selectedCourse, setSelectedCourse] = useState("Select a Course");
 
     const fileInputRef = useRef(null);
+
+    const professorCourses = ["CDA3103", "COP3330", "CEN4020"];
 
     // Handle file selection
     const handleFileUpload = (event) => {
@@ -98,9 +102,12 @@ function ProfessorDashboard() {
                 {/* Header */}
                 <div className="prof-header">
                     <h1 className="prof-header-title">CDA3103 - Virtual Assistant</h1>
-                    <div className="prof-course-dropdown">
-                        <span>Courses ▼</span>
-                    </div>
+                    
+                    {/* Course Dropdown */}
+                    <CourseDropdown 
+                        courses={professorCourses} 
+                        onSelectCourse={setSelectedCourse} 
+                    />
                 </div>
 
                 {/* Chat Box */}

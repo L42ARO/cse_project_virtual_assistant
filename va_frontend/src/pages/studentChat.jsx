@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./studentChat.css";
+import CourseDropdown from "../components/CourseDropdown";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -11,6 +12,9 @@ function StudentChat() {
     const [chatInput, setChatInput] = useState("");
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [sessionId, setSessionId] = useState(null);
+    const [selectedCourse, setSelectedCourse] = useState("Select a Course");
+
+    const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
 
     // Handles sending the first message
     const handleSendMessage = async () => {
@@ -78,9 +82,12 @@ function StudentChat() {
                 {/* Header */}
                 <div className="student-header">
                     <h1 className="student-header-title">CDA3103 - Virtual Assistant</h1>
-                    <div className="student-course-dropdown">
-                        <span>Courses ▼</span>
-                    </div>
+                    
+                    {/* Course Dropdown */}
+                    <CourseDropdown 
+                        courses={studentCourses} 
+                        onSelectCourse={setSelectedCourse} 
+                    />
                 </div>
 
                 {/* Chat Box */}
