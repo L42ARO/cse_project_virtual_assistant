@@ -1,5 +1,5 @@
 /* Main container */
-.chat-container {
+.student-chat-container {
   display: flex;
   height: 100vh;
   width: 100%;
@@ -7,7 +7,7 @@
 }
 
 /* Sidebar (Chat History) */
-.sidebar {
+.student-sidebar {
   width: 20%;
   background-color: #E6E8E6; /* Sidebar gray */
   display: flex;
@@ -16,13 +16,13 @@
   padding: 20px;
 }
 
-.sidebar-title {
+.student-sidebar-title {
   font-size: 18px;
   font-weight: bold;
   color: #000;
 }
 
-.logout-button {
+.student-logout-button {
   background: none;
   border: none;
   font-size: 16px;
@@ -33,12 +33,12 @@
   gap: 8px;
 }
 
-.logout-button:hover {
+.student-logout-button:hover {
   text-decoration: underline;
 }
 
 /* Main Content */
-.main-content {
+.student-main-content {
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,7 @@
 }
 
 /* Header */
-.header {
+.student-header {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -57,20 +57,20 @@
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.header-title {
+.student-header-title {
   font-size: 22px;
   font-weight: bold;
   color: #000;
 }
 
-.course-dropdown {
+.student-course-dropdown {
   font-size: 16px;
   cursor: pointer;
   color: #3F403F;
 }
 
 /* Chat Box */
-.chat-box {
+.student-chat-box {
   width: 90%;
   height: 60vh;
   background-color: #E6E8E6;
@@ -80,14 +80,14 @@
 }
 
 /* Input Box (Updated to Match Professor Dashboard) */
-.input-container {
+.student-input-container {
   display: flex;
   align-items: center;
   width: 90%;
   margin-top: 10px;
 }
 
-.chat-input {
+.student-chat-input {
   flex-grow: 1;
   padding: 12px;
   border: 1px solid #475841;
@@ -96,7 +96,7 @@
 }
 
 /* Upload Button */
-.upload-button {
+.student-upload-button {
   background-color: white;
   border: 1px solid #475841;
   border-radius: 10px;
@@ -105,13 +105,13 @@
   cursor: pointer;
 }
 
-.upload-button:hover {
+.student-upload-button:hover {
   background-color: #475841;
   color: white;
 }
 
 /* Right Sidebar (Flagged Questions) */
-.right-sidebar {
+.student-right-sidebar {
   width: 20%;
   background-color: #E6E8E6;
   padding: 20px;

@@ -66,25 +66,25 @@ function StudentChat() {
     }, [socket]);
 
     return (
-        <div className="chat-container">
+        <div className="student-chat-container">
             {/* Sidebar - Chat History */}
-            <div className="sidebar">
-                <h2 className="sidebar-title">Chat History</h2>
-                <button className="logout-button">← Log out</button>
+            <div className="student-sidebar">
+                <h2 className="student-sidebar-title">Chat History</h2>
+                <button className="student-logout-button">← Log out</button>
             </div>
 
             {/* Main Chat Section */}
-            <div className="main-content">
+            <div className="student-main-content">
                 {/* Header */}
-                <div className="header">
-                    <h1 className="header-title">CDA3103 - Virtual Assistant</h1>
-                    <div className="course-dropdown">
+                <div className="student-header">
+                    <h1 className="student-header-title">CDA3103 - Virtual Assistant</h1>
+                    <div className="student-course-dropdown">
                         <span>Courses ▼</span>
                     </div>
                 </div>
 
                 {/* Chat Box */}
-                <div className="chat-box">
+                <div className="student-chat-box">
                     {chatMessages.map((msg, index) => (
                         <div key={index} className={`chat-message ${msg.sender}`}>
                             <strong>{msg.sender}:</strong> {msg.message}
@@ -93,10 +93,10 @@ function StudentChat() {
                 </div>
 
                 {/* Input Box */}
-                <div className="input-container">
+                <div className="student-input-container">
                     <input
                         type="text"
-                        className="chat-input"
+                        className="student-chat-input"
                         placeholder="Enter Question"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
@@ -106,8 +106,8 @@ function StudentChat() {
             </div>
 
             {/* Sidebar - Flagged Questions */}
-            <div className="right-sidebar">
-                <h2 className="sidebar-title">Flagged Questions</h2>
+            <div className="student-right-sidebar">
+                <h2 className="student-sidebar-title">Flagged Questions</h2>
             </div>
         </div>
     );

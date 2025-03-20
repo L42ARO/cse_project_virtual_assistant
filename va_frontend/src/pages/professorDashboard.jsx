@@ -80,31 +80,31 @@ function ProfessorDashboard() {
     }, [socket]);
 
     return (
-        <div className="dashboard-container">
+        <div className="prof-dashboard-container">
             {/* Sidebar */}
-            <div className="sidebar">
-                <h2 className="sidebar-title">Dashboard</h2>
-                <nav className="nav-menu">
-                    <p className="nav-item">🏠 Dashboard</p>
-                    <p className="nav-item">👥 Student Activity</p>
-                    <p className="nav-item">⚙️ AI Settings</p>
-                    <p className="nav-item">🔔 Notifications</p>
+            <div className="prof-sidebar">
+                <h2 className="prof-sidebar-title">Dashboard</h2>
+                <nav className="prof-nav-menu">
+                    <p className="prof-nav-item">🏠 Dashboard</p>
+                    <p className="prof-nav-item">👥 Student Activity</p>
+                    <p className="prof-nav-item">⚙️ AI Settings</p>
+                    <p className="prof-nav-item">🔔 Notifications</p>
                 </nav>
-                <button className="logout-button">← Log out</button>
+                <button className="prof-logout-button">← Log out</button>
             </div>
 
             {/* Main Content */}
-            <div className="main-content">
+            <div className="prof-main-content">
                 {/* Header */}
-                <div className="header">
-                    <h1 className="header-title">CDA3103 - Virtual Assistant</h1>
-                    <div className="course-dropdown">
+                <div className="prof-header">
+                    <h1 className="prof-header-title">CDA3103 - Virtual Assistant</h1>
+                    <div className="prof-course-dropdown">
                         <span>Courses ▼</span>
                     </div>
                 </div>
 
                 {/* Chat Box */}
-                <div className="chat-box">
+                <div className="prof-chat-box">
                     {chatMessages.map((msg, index) => (
                         <div key={index} className={`chat-message ${msg.sender}`}>
                             <strong>{msg.sender}:</strong> {msg.message}
@@ -113,10 +113,10 @@ function ProfessorDashboard() {
                 </div>
 
                 {/* Input Box */}
-                <div className="input-container">
+                <div className="prof-input-container">
                     <input
                         type="text"
-                        className="chat-input"
+                        className="prof-chat-input"
                         placeholder="Enter Question"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
@@ -132,7 +132,7 @@ function ProfessorDashboard() {
 
                     {/* Upload Button */}
                     <button 
-                      className="upload-button" 
+                      className="prof-upload-button" 
                       onClick={() => fileInputRef.current.click()}
                     >
                       ⬆️
