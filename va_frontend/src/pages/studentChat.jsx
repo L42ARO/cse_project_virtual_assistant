@@ -86,8 +86,9 @@ function StudentChat() {
                 {/* Chat Box */}
                 <div className="student-chat-box">
                     {chatMessages.map((msg, index) => (
-                        <div key={index} className={`chat-message ${msg.sender}`}>
-                            <strong>{msg.sender}:</strong> {msg.message}
+                        <div key={index} className={`student-chat-message ${msg.sender}`}>
+                            <div className="student-sender-name">{msg.sender}</div>
+                            <div className="student-message-bubble">{msg.message}</div>
                         </div>
                     ))}
                 </div>

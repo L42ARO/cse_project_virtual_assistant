@@ -106,8 +106,9 @@ function ProfessorDashboard() {
                 {/* Chat Box */}
                 <div className="prof-chat-box">
                     {chatMessages.map((msg, index) => (
-                        <div key={index} className={`chat-message ${msg.sender}`}>
-                            <strong>{msg.sender}:</strong> {msg.message}
+                        <div key={index} className={`prof-chat-message ${msg.sender}`}>
+                            <div className="prof-sender-name">{msg.sender}</div>
+                            <div className="prof-message-bubble">{msg.message}</div>
                         </div>
                     ))}
                 </div>
