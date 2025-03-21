@@ -3,6 +3,7 @@ import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./professorDashboard.css";
 import CourseDropdown from "../components/CourseDropdown";
+import ChatBubble from "../components/ChatBubble";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
@@ -111,12 +112,13 @@ function ProfessorDashboard() {
                 </div>
 
                 {/* Chat Box */}
-                <div className="prof-chat-box">
+                <div className="student-chat-box">
                     {chatMessages.map((msg, index) => (
-                        <div key={index} className={`prof-chat-message ${msg.sender}`}>
-                            <div className="prof-sender-name">{msg.sender}</div>
-                            <div className="prof-message-bubble">{msg.message}</div>
-                        </div>
+                        <ChatBubble 
+                            key={index} 
+                            sender={msg.sender} 
+                            message={msg.message} 
+                        />
                     ))}
                 </div>
 

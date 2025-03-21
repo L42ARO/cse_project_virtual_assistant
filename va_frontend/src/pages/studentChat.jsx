@@ -3,6 +3,7 @@ import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./studentChat.css";
 import CourseDropdown from "../components/CourseDropdown";
+import ChatBubble from "../components/ChatBubble";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -93,10 +94,11 @@ function StudentChat() {
                 {/* Chat Box */}
                 <div className="student-chat-box">
                     {chatMessages.map((msg, index) => (
-                        <div key={index} className={`student-chat-message ${msg.sender}`}>
-                            <div className="student-sender-name">{msg.sender}</div>
-                            <div className="student-message-bubble">{msg.message}</div>
-                        </div>
+                        <ChatBubble 
+                            key={index} 
+                            sender={msg.sender} 
+                            message={msg.message} 
+                        />
                     ))}
                 </div>
 
