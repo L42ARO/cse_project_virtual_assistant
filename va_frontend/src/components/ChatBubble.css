@@ -1,0 +1,43 @@
+.chat-message {
+    display: flex;
+    width: 100%;
+    margin: 2px 0;
+  }
+  
+  .chat-message.User,
+  .chat-message.Professor {
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-direction: column;
+  }
+  
+  .chat-message.AI {
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  
+  .message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+  }
+  
+  .sender-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #3F403F;
+    margin-bottom: 2px;
+  }
+  
+  .message-bubble {
+    background-color: #475841;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    display: inline-block;
+  }
+  
