@@ -85,6 +85,12 @@
   font-size: 16px;
 }
 
+.student-left-sidebar {
+  width: 20%;
+  background-color: #E6E8E6;
+  padding: 20px;
+}
+
 /* Right Sidebar (Flagged Questions) */
 .student-right-sidebar {
   width: 20%;

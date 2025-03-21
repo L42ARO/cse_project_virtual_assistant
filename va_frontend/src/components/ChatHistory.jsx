@@ -5,8 +5,6 @@ import "./ChatHistory.css"; // Import styles if needed
 const ChatHistory = ({ chatSessions, onSelectChat, selectedChat }) => {
   return (
     <div className="chat-history-container">
-      {/* Title of the chat history section */}
-      <h2 className="chat-history-title">Chat History</h2>
 
       {/* Unordered list to show the chat items */}
       <ul className="chat-history-list">

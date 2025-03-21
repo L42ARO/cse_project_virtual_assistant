@@ -88,22 +88,36 @@ function StudentChat() {
     
         // TODO: Load chat messages for the selected chat session from backend
         // For now, we'll just clear and simulate:
-        setChatMessages([]);
-        setHasSentInitialMessage(true);
-        setSessionId(chat.id);  // Simulate as session ID
+        if (selectedChat && selectedChat.id === chat.id) {
+            // Unselect if same chat is clicked again
+            setSelectedChat(null);
+            setChatMessages([]);
+            setSessionId(null);
+            setHasSentInitialMessage(false);
+        } else {
+            setSelectedChat(chat);
+            setChatMessages([]);
+            setHasSentInitialMessage(true);
+            setSessionId(chat.id);  // Simulate as session ID
+        }
     };
     
 
     return (
         <div className="student-chat-container">
-            {/* Sidebar - Chat History */}
-            <ChatHistory 
-                chatSessions={chatHistory} 
-                onSelectChat={handleSelectChat} 
-                selectedChat={selectedChat}
-            />
-
             {/* Main Chat Section */}
+            <div className="student-left-sidebar">
+                {/* Title of the chat history section */}
+                <h2 className="student-sidebar-title">Chat History</h2>
+
+                {/* Sidebar - Chat History */}
+                <ChatHistory 
+                    chatSessions={chatHistory.filter(chat => chat.course === selectedCourse)}
+                    onSelectChat={handleSelectChat} 
+                    selectedChat={selectedChat}
+                />
+            </div>
+
             <div className="student-main-content">
                 {/* Header */}
                 <div className="student-header">

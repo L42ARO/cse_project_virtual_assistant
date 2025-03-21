@@ -27,7 +27,7 @@ const CourseDropdown = ({ courses, onSelectCourse }) => {
           {/* Render each course as a clickable item */}
           {courses.map((course, index) => (
             <li
-              key={index}
+              key={course.id}
               onClick={() => handleSelect(course)}
               className="dropdown-item"
             >

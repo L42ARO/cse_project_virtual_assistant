@@ -1,13 +1,7 @@
 .chat-history-container {
-    width: 20%;
+    width: 90%;
     background: #E6E8E6;
     padding: 10px;
-  }
-  
-  .chat-history-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
   }
   
   .chat-history-list {
