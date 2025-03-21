@@ -1,0 +1,47 @@
+.chat-history-container {
+    width: 20%;
+    background: #E6E8E6;
+    padding: 10px;
+  }
+  
+  .chat-history-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .chat-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .chat-history-item {
+    padding: 12px;
+    cursor: pointer;
+    background: white;
+    border-radius: 20px; /* Makes it bubble-like */
+    border: 1px solid #ddd;
+    transition: background 0.3s, transform 0.1s;
+    margin: 8px 0; /* Add spacing between bubbles */
+    text-align: center; /* Center text in the bubble */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.chat-history-item:hover {
+    background: #e6e6e6;
+    transform: scale(1.02); /* Slight pop effect */
+}
+
+.chat-history-item.selected {
+    background: #475841;
+    color: white;
+    font-weight: bold;
+    border-color: #475841;
+}
+  
+  .no-chats {
+    text-align: center;
+    color: gray;
+  }
+  

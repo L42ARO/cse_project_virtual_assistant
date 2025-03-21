@@ -4,6 +4,7 @@ import { useAPI } from "../context/apiService";
 import "./studentChat.css";
 import CourseDropdown from "../components/CourseDropdown";
 import ChatBubble from "../components/ChatBubble";
+import ChatHistory from "../components/ChatHistory";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -14,8 +15,20 @@ function StudentChat() {
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [selectedCourse, setSelectedCourse] = useState("Select a Course");
+    const [chatHistory, setChatHistory] = useState([]);
+    const [selectedChat, setSelectedChat] = useState(null);
+
 
     const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
+
+    useEffect(() => {
+        // Temporary mock history (will replace with real API later)
+        const mockHistory = [
+            { id: 1, course: "CDA3103", timestamp: "2024-03-18T10:00:00Z" },
+            { id: 2, course: "COP3330", timestamp: "2024-03-19T12:15:00Z" }
+        ];
+        setChatHistory(mockHistory);
+    }, []);    
 
     // Handles sending the first message
     const handleSendMessage = async () => {
@@ -70,13 +83,25 @@ function StudentChat() {
         };
     }, [socket]);
 
+    const handleSelectChat = (chat) => {
+        setSelectedChat(chat);
+    
+        // TODO: Load chat messages for the selected chat session from backend
+        // For now, we'll just clear and simulate:
+        setChatMessages([]);
+        setHasSentInitialMessage(true);
+        setSessionId(chat.id);  // Simulate as session ID
+    };
+    
+
     return (
         <div className="student-chat-container">
             {/* Sidebar - Chat History */}
-            <div className="student-sidebar">
-                <h2 className="student-sidebar-title">Chat History</h2>
-                <button className="student-logout-button">← Log out</button>
-            </div>
+            <ChatHistory 
+                chatSessions={chatHistory} 
+                onSelectChat={handleSelectChat} 
+                selectedChat={selectedChat}
+            />
 
             {/* Main Chat Section */}
             <div className="student-main-content">
