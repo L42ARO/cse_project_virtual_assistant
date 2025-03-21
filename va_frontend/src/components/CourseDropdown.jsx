@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./CourseDropdown.css";
 
 const CourseDropdown = ({ courses, onSelectCourse }) => {
-  const [selectedCourse, setSelectedCourse] = useState(courses[0] || "Select a Course");
+  const [selectedCourse, setSelectedCourse] = useState("Select a Course");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (course) => {

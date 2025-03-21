@@ -82,7 +82,9 @@ function StudentChat() {
             <div className="student-main-content">
                 {/* Header */}
                 <div className="student-header">
-                    <h1 className="student-header-title">CDA3103 - Virtual Assistant</h1>
+                    <h1 className="student-header-title">
+                        {selectedCourse !== "Select a Course" ? `${selectedCourse} - Virtual Assistant` : "Virtual Assistant"}
+                    </h1>
                     
                     {/* Course Dropdown */}
                     <CourseDropdown 

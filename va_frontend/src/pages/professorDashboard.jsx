@@ -21,11 +21,24 @@ function ProfessorDashboard() {
 
     // Handle file selection
     const handleFileUpload = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        alert(`File "${file.name}" uploaded successfully! (Simulated)`);
-      }
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        // Create a file message object
+        const fileMessage = {
+            message: file.name,  // Display the file name
+            sender: "Professor",
+            timestamp: new Date().toISOString(),
+            type: "file"  // Mark it as a file type
+        };
+
+        // Add the file message to chat history
+        setChatMessages((prev) => [...prev, fileMessage]);
+
+        // Here, you would normally upload the file to a server (backend integration)
     };
+
     // Handles sending the first message
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
@@ -102,8 +115,10 @@ function ProfessorDashboard() {
             <div className="prof-main-content">
                 {/* Header */}
                 <div className="prof-header">
-                    <h1 className="prof-header-title">CDA3103 - Virtual Assistant</h1>
-                    
+                    <h1 className="prof-header-title">
+                        {selectedCourse !== "Select a Course" ? `${selectedCourse} - Virtual Assistant` : "Virtual Assistant"}
+                    </h1>
+
                     {/* Course Dropdown */}
                     <CourseDropdown 
                         courses={professorCourses} 
@@ -118,6 +133,7 @@ function ProfessorDashboard() {
                             key={index} 
                             sender={msg.sender} 
                             message={msg.message} 
+                            type={msg.type} 
                         />
                     ))}
                 </div>
