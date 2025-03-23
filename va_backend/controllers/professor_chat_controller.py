@@ -74,7 +74,6 @@ def upload_file():
         file.save(file_path)
 
         return http_response("File uploaded successfully", 200, data={"file_id": file_id})
-
     except Exception as e:
         return http_response("Internal server error", 500, error=str(e))
 
