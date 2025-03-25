@@ -1,6 +1,14 @@
 from flask import Blueprint, jsonify, request
 from azure.data.tables import TableClient
 import hashlib
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv("STORAGE_KEY")
+
+if not api_key:
+    raise ValueError("❌ API key not found! Check your .env file.")
 
 bp = Blueprint("users_controller", __name__)
 prefix = "/users"
@@ -31,7 +39,7 @@ def comparePassword(username, password):
     my_filter = f"RowKey eq '{username}'"
     
     table_client = TableClient.from_connection_string(
-        conn_str="DefaultEndpointsProtocol=https;AccountName=usfcapstone2025;AccountKey=wsIxrj3w52BcxjwVHn/ynTgCZAgNDCMDL0KPFkIeYSfNO/L8R31/SR8Xvu6Y7/gv2ld8iQhRsMdO+ASteolgaw==;EndpointSuffix=core.windows.net",
+        conn_str=f"DefaultEndpointsProtocol=https;AccountName=usfcapstone2025;AccountKey={api_key};EndpointSuffix=core.windows.net",
         table_name="userdata"
     )
     
@@ -42,7 +50,7 @@ def isProfessor(username):
     my_filter = "PartitionKey eq 'Professor'"
     
     table_client = TableClient.from_connection_string(
-        conn_str="DefaultEndpointsProtocol=https;AccountName=usfcapstone2025;AccountKey=wsIxrj3w52BcxjwVHn/ynTgCZAgNDCMDL0KPFkIeYSfNO/L8R31/SR8Xvu6Y7/gv2ld8iQhRsMdO+ASteolgaw==;EndpointSuffix=core.windows.net",
+        conn_str=f"DefaultEndpointsProtocol=https;AccountName=usfcapstone2025;AccountKey={api_key};EndpointSuffix=core.windows.net",
         table_name="userdata"
     )
     
