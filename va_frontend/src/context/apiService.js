@@ -28,7 +28,7 @@ export const useAPI = () => {
   };
 
   // Starts a student chat session
-  const startChat = async (userId, courseId, initialMessage, key) => {
+  const sccStartChat = async (userId, courseId, initialMessage, key) => {
     const payload = {
       user_id: userId,
       key: key,
@@ -45,6 +45,35 @@ export const useAPI = () => {
     });
   };
 
+  const sccContChat = (socket, session_id, message, key) => {
+    const payload = {
+      key:key,
+      message: message.trim(),
+      session_id: session_id,
+    };
+
+    if (!socket) {
+      console.error("Socket is not available to send the chat message.");
+      return;
+    }
+    // Emit the event to the server
+    socket.emit("ws_scc_chat_req", payload);
+  };
+
+  const pccContChat = (socket, session_id, message, key) => {
+    const payload = {
+      key:key,
+      message: message.trim(),
+      session_id: session_id,
+    };
+
+    if (!socket) {
+      console.error("Socket is not available to send the chat message.");
+      return;
+    }
+    // Emit the event to the server
+    socket.emit("ws_pcc_chat_req", payload);
+  };
   // Creates a new course (Professor API)
   const createNewCourse = async (professorId, key, initialMessage, courseName, courseSection, courseTerm) => {
     const payload = {
@@ -134,7 +163,9 @@ export const useAPI = () => {
     fetchHttpMessage,
     fetchDelayedHttpMessage,
     sendChatMessage,
-    startChat, 
+    sccStartChat, 
+    sccContChat,
+    pccContChat,
     createNewCourse, // New API function for creating a course
     uploadFile,// New API function for file uploads
     fetchUsers,

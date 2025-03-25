@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-class StartChatReq(BaseModel):
+class sccChatStartReq(BaseModel):
     user_id: str
     key: str
     initial_message: str

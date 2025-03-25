@@ -7,7 +7,7 @@ import ChatBubble from "../components/ChatBubble";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
-    const { createNewCourse } = useAPI();
+    const { createNewCourse, pccContChat } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -86,7 +86,9 @@ function ProfessorDashboard() {
                 console.error("Failed to start course chat:", response.error);
             }
         }
-
+        else{
+            const response = pccContChat(socket, "12341234", chatInput, "123456789")
+        }
         setChatInput(""); // Clear input after sending
     };
 
@@ -113,12 +115,12 @@ function ProfessorDashboard() {
         const handleAIResponse = (data) => handleIncomingMessage(data, "AI");
         const handleUserResponse = (data) => handleIncomingMessage(data, "Professor");
 
-        socket.on("ws_ai_res", handleAIResponse);
-        socket.on("ws_user_res", handleUserResponse);
+        socket.on("ws_pcc_ai_res", handleAIResponse);
+        socket.on("ws_pcc_user_res", handleUserResponse);
 
         return () => {
-            socket.off("ws_ai_res", handleAIResponse);
-            socket.off("ws_user_res", handleUserResponse);
+            socket.off("ws_pcc_ai_res", handleAIResponse);
+            socket.off("ws_pcc_user_res", handleUserResponse);
         };
     }, [socket]);
 

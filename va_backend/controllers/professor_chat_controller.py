@@ -3,11 +3,13 @@ import os
 from flask import Blueprint, request
 from flask_socketio import SocketIO
 from pydantic import ValidationError
-from models.new_course_req import NewCourseReq
+from models.pcc_course_new_req import *
+from models.pcc_chat_cont_req import *
 from datetime import datetime, timezone
 from utils.utils import http_response
-from openai import AzureOpenAI
 from dotenv import load_dotenv
+from services.openai_service import *
+
 
 # Create a Blueprint
 socketio = None
@@ -45,7 +47,7 @@ def new_course():
 
         # Validate input with Pydantic
         try:
-            course_request = NewCourseReq(**data)
+            course_request = pccCourseNewReq(**data)
         except ValidationError as e:
             return http_response("Invalid request data", 400, error=str(e))
 
@@ -55,8 +57,8 @@ def new_course():
         timestamp = datetime.now(timezone.utc).isoformat()
 
         # Emit WebSocket events
-        socketio.emit("ws_user_res", {"message": course_request.initial_message, "timestamp": timestamp})
-        socketio.emit("ws_ai_res", {"message": "Hi please tell me more about my role as your assistant for CDA3103, Feel free to provide more instructions on the specific questions I should answer, or upload more class materials", "timestamp": timestamp})
+        socketio.emit("ws_pcc_user_res", {"message": course_request.initial_message, "timestamp": timestamp})
+        socketio.emit("ws_pcc_ai_res", {"message": "Hi please tell me more about my role as your assistant for CDA3103, Feel free to provide more instructions on the specific questions I should answer, or upload more class materials", "timestamp": timestamp})
 
         return http_response("Course created successfully", 200, data={"course_id": course_id})
 
@@ -114,3 +116,19 @@ def register_socketio_events(_socketio: SocketIO):
     """Registers WebSocket event handlers."""
     global socketio
     socketio = _socketio
+
+    @socketio.on("ws_pcc_chat_req")
+    def handle_student_msg_req(data):
+        chat_request = pccChatContReq(**data)
+        message = chat_request.message #data.get("message", "")
+        session_id = chat_request.session_id #data.get("session_id", "") #get the session id for data
+        # call the openai service and have it reply 
+
+        timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
+        socketio.emit("ws_pcc_user_res", {"message": message, "timestamp": timestamp})
+        try:
+            ai_response = add_message(user_id=session_id, user_message=message)
+        except:
+            ai_response = "Professor Azure is Down sorry!"
+
+        socketio.emit("ws_pcc_ai_res", {"message": ai_response, "timestamp": timestamp})

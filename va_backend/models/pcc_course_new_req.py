@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-class NewCourseReq(BaseModel):
+class pccCourseNewReq(BaseModel):
     professor_id: str
     key: str
     initial_message: str

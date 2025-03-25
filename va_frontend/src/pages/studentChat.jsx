@@ -8,7 +8,7 @@ import ChatHistory from "../components/ChatHistory";
 
 function StudentChat() {
     const { socket } = useServer();
-    const { startChat } = useAPI();
+    const { sccContChat, sccStartChat } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -36,13 +36,16 @@ function StudentChat() {
 
         if (!hasSentInitialMessage) {
             // Start a new chat session
-            const response = await startChat("user123", "course456", chatInput, "123456789");
+            const response = await sccStartChat("user123", "course456", chatInput, "123456789");
             if (response.data.session_id) {
                 setSessionId(response.session_id);
                 setHasSentInitialMessage(true);
             } else {
                 console.error("Failed to start chat:", response.error);
             }
+        }
+        else{
+            const response = sccContChat(socket,"123456", chatInput, "123456789");
         }
 
         setChatInput(""); // Clear input field after submission
@@ -74,12 +77,12 @@ function StudentChat() {
         const handleAIResponse = (data) => handleIncomingMessage(data, "AI");
         const handleUserResponse = (data) => handleIncomingMessage(data, "User");
 
-        socket.on("ws_ai_res", handleAIResponse);
-        socket.on("ws_user_res", handleUserResponse);
+        socket.on("ws_scc_ai_res", handleAIResponse);
+        socket.on("ws_scc_user_res", handleUserResponse);
 
         return () => {
-            socket.off("ws_ai_res", handleAIResponse);
-            socket.off("ws_user_res", handleUserResponse);
+            socket.off("ws_scc_ai_res", handleAIResponse);
+            socket.off("ws_scc_user_res", handleUserResponse);
         };
     }, [socket]);
 

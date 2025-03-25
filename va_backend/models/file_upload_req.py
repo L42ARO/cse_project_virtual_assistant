@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
-class UploadFileReq(BaseModel):
+class FileUploadReq(BaseModel):
     course_id: str
     file_name: str
