@@ -102,18 +102,33 @@ export const useAPI = () => {
     socket.emit("send_chat", payload);
   };
 
-  const studentChatMessage = (socket,message) => {
-    if (!socket) {
-      console.error("Socket is not available to send the chat message.");
-      return;
+  const fetchUsers = async () => {
+    return await fetchAPI("/users/get-users");
+  };
+
+  // Function to login a user
+  const loginUser = async (username, password) => {
+  const payload = { username, password };
+
+  try {
+    const response = await fetchAPI("/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // Check if the response contains an error message or not
+    if (response.error) {
+      throw new Error(response.error);
     }
-
-    // Standardized message format
-    const payload = { message: message.trim(), session_id: session_id.trim()};
-
-    // Emit the event to the server
-    socket.emit("student_chat_msg", payload);
+    return response; // Return the response data from the server (success or message)
+  } catch (error) {
+    console.error("Login API error:", error);
+    return { error: error.message };  // Handle errors here
   }
+};
 
   return {
     fetchHttpMessage,
@@ -121,6 +136,8 @@ export const useAPI = () => {
     sendChatMessage,
     startChat, 
     createNewCourse, // New API function for creating a course
-    uploadFile, // New API function for file uploads
+    uploadFile,// New API function for file uploads
+    fetchUsers,
+    loginUser
   };
 };
