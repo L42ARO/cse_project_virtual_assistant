@@ -36,7 +36,32 @@ function ProfessorDashboard() {
         // Add the file message to chat history
         setChatMessages((prev) => [...prev, fileMessage]);
 
-        // Here, you would normally upload the file to a server (backend integration)
+
+        // Convert the file to a blob and upload it to the server
+        const fileBlob = new Blob([file], { type: file.type });
+        uploadFileToServer(fileBlob, file.name);
+    };
+
+    const uploadFileToServer = async (fileBlob, fileName) => {
+        const formData = new FormData();
+        formData.append("file", fileBlob, fileName);
+        formData.append("course_id", "your_course_id");  // Replace with actual course ID
+
+        try {
+            const response = await fetch("http://localhost:8000/pcc/upload-file", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                console.log("File uploaded successfully:", result.data.file_id);
+            } else {
+                console.error("File upload failed:", result.error);
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+        }
     };
 
     // Handles sending the first message

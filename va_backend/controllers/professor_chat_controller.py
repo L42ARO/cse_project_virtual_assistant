@@ -6,11 +6,32 @@ from pydantic import ValidationError
 from models.new_course_req import NewCourseReq
 from datetime import datetime, timezone
 from utils.utils import http_response
+from openai import AzureOpenAI
+from dotenv import load_dotenv
 
 # Create a Blueprint
 socketio = None
 bp = Blueprint("professor_chat_controller", __name__)
 prefix = "/pcc"
+
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY_1")
+
+if not api_key:
+    raise ValueError("❌ API key not found! Check your .env file.")
+
+endpoint = os.getenv("AZURE_OPENAI_API_ENDPOINT")
+if not endpoint:
+    raise ValueError("❌ ENDPOINT not found! Check your .env file.")
+
+client = AzureOpenAI(
+    azure_endpoint=endpoint,
+    api_key=api_key,
+    api_version="2024-05-01-preview",
+)
+
+# Replace with the actual vector store ID you want to update
+vector_store_id = "vs_vHqsM3doZ4TqM8RYAAuUpLUe"
 
 
 @bp.route(f"{prefix}/new-course", methods=["POST"])
@@ -73,8 +94,17 @@ def upload_file():
         file_path = os.path.join(upload_dir, f"{file_id}_{file.filename}")
         file.save(file_path)
 
-        return http_response("File uploaded successfully", 200, data={"file_id": file_id})
+        # Update the vector store with the uploaded file
+        file_streams = [open(file_path, "rb")]
+        file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+            vector_store_id=vector_store_id, files=file_streams
+        )
 
+        print(f"Updated Vector Store ID: {vector_store_id}")
+        print("Upload Status:", file_batch.status)
+        print("File Counts:", file_batch.file_counts)
+
+        return http_response("File uploaded successfully", 200, data={"file_id": file_id})
     except Exception as e:
         return http_response("Internal server error", 500, error=str(e))
 
