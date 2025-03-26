@@ -124,6 +124,21 @@ function ProfessorDashboard() {
         };
     }, [socket]);
 
+    useEffect(() => {
+            // Reset chat-related state when course is changed
+            setChatMessages([]);
+            setHasSentInitialMessage(false);
+            setChatInput("");
+        }, [selectedCourse]); 
+
+    const handleLogout = () => {
+        // Clear auth-related items from localStorage
+        localStorage.clear();
+    
+        // Redirect to login
+        window.location.href = "/ui/login";
+    };
+
     return (
         <div className="prof-dashboard-container">
             {/* Sidebar */}
@@ -135,7 +150,7 @@ function ProfessorDashboard() {
                     <p className="prof-nav-item">⚙️ AI Settings</p>
                     <p className="prof-nav-item">🔔 Notifications</p>
                 </nav>
-                <button className="prof-logout-button">← Log out</button>
+                <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
 
             {/* Main Content */}
