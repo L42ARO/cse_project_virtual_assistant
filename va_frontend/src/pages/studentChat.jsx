@@ -156,16 +156,17 @@ function StudentChat() {
         <div className="student-chat-container">
             {/* Main Chat Section */}
             <div className="student-left-sidebar">
-                {/* Title of the chat history section */}
-                <h2 className="student-sidebar-title">Chat History</h2>
+                <div className="student-sidebar-content">
+                    {/* Title of the chat history section */}
+                    <h2 className="student-sidebar-title">Chat History</h2>
 
-                {/* Sidebar - Chat History */}
-                <ChatHistory 
-                    chatSessions={chatHistory.filter(chat => chat.course === selectedCourse)}
-                    onSelectChat={handleSelectChat} 
-                    selectedChat={selectedChat}
-                />
-
+                    {/* Sidebar - Chat History */}
+                    <ChatHistory 
+                        chatSessions={chatHistory.filter(chat => chat.course === selectedCourse)}
+                        onSelectChat={handleSelectChat} 
+                        selectedChat={selectedChat}
+                    />
+                </div>
                 <button onClick={handleLogout} className="student-logout-button"> ← Log out </button>
             </div>
 

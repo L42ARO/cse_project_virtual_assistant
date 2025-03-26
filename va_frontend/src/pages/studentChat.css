@@ -23,18 +23,19 @@
 }
 
 .student-logout-button {
-  background: none;
+  padding: 10px 12px;
+  background-color: white;
+  color: black;
   border: none;
-  font-size: 16px;
+  border-radius: 6px;
   cursor: pointer;
-  color: #000;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: 100%;
+  margin-top: auto;
 }
 
 .student-logout-button:hover {
-  text-decoration: underline;
+  background-color: #475841;
+  color: white;
 }
 
 /* Main Content */
@@ -86,9 +87,14 @@
 }
 
 .student-left-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh; /* Ensure full height */
   width: 20%;
   background-color: #E6E8E6;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 /* Right Sidebar (Flagged Questions) */
@@ -96,6 +102,14 @@
   width: 20%;
   background-color: #E6E8E6;
   padding: 20px;
+}
+
+.student-sidebar-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
 }
 
 /* Chat Box */
