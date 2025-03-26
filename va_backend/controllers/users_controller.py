@@ -3,6 +3,11 @@ from azure.data.tables import TableClient
 import hashlib
 from dotenv import load_dotenv
 import os
+import datetime
+import jwt
+
+
+SECRET_KEY = "your_secret_key"  # Change this to a secure key
 
 load_dotenv()
 api_key = os.getenv("STORAGE_KEY")
@@ -16,23 +21,31 @@ prefix = "/users"
 # Login route to check username and password
 @bp.route(f'{prefix}/login', methods=["POST"])
 def login():
-    data = request.get_json()  # Get the username and password from the request body
+    data = request.get_json()
     username = data.get("username")
     password = data.get("password")
-    
+
     if not username or not password:
-        
         return jsonify({"error": "Username and password are required."}), 400
 
-    # Compare username and password with database
+    # Validate username and password with database
     if comparePassword(username, password):
-        if isProfessor(username):
-            return jsonify({"message": "professor"}), 200
-        else:
-            #print(f"{username},{password}")
-            return jsonify({"message": "student"}), 200
+        role = "professor" if isProfessor(username) else "student"
+
+        # Generate JWT token
+        token = jwt.encode(
+            {
+                "username": username,
+                "role": role,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expiration time
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+
+        return jsonify({"token": token, "role": role}), 200
     else:
-        return jsonify({"message": "Invalid username or password."}), 200
+        return jsonify({"message": "Invalid username or password."}), 401
 
 def comparePassword(username, password):
     password_hash = hashlib.sha256(password.encode()).hexdigest()

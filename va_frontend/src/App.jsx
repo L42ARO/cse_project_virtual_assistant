@@ -7,16 +7,16 @@ import ProfessorChatTesting from './pages/professorChatTesting.jsx';
 import StudentChat from './pages/studentChat.jsx';
 import APIUsageExample from './pages/APIUsageExample.jsx';
 import { ServerProvider } from './context/serverContext.jsx';
+import Unauthorized from "./pages/Unauthorized.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";  // Import ProtectedRoute
 import './App.css';
 
 // Centralized Routes List
 const routesList = [
   { url: "/ui/login", comp: <LoginForm /> },
-  { url: "/ui/chat", comp: <StudentChat />, alias: "Student Chat" },
-  { url: "/ui/professor-dashboard", comp: <ProfessorDashboard />, alias: "Professor Dashboard" },
-  // { url: "/ui/professor-files", comp: <ProfessorFiles />, alias: "Professor Files" },
-  // { url: "/ui/chat-testing", comp: <ProfessorChatTesting />, alias: "Professor Chat Testing" },
- { url: "/ui/api-example", comp: <APIUsageExample />, alias: "API Example" },
+  { url: "/ui/chat", comp: <StudentChat />, alias: "Student Chat", role: "student" },
+  { url: "/ui/professor-dashboard", comp: <ProfessorDashboard />, alias: "Professor Dashboard", role: "professor" },
+  { url: "/ui/api-example", comp: <APIUsageExample />, alias: "API Example" },
 ];
 
 function App() {
@@ -28,9 +28,23 @@ function App() {
           <div className="main-content">
             <Routes>
               <Route path="/" element={<Navigate to={routesList[0].url} replace />} />
-              {routesList.map(({ url, comp }) => (
-                <Route key={url} path={url} element={comp} />
-              ))}
+              <Route path="/ui/login" element={<LoginForm />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+                <Route path="/ui/chat" element={<StudentChat />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={["professor"]} />}>
+                <Route path="/ui/professor-dashboard" element={<ProfessorDashboard />} />
+                <Route path="/ui/professor-files" element={<ProfessorFiles />} />
+                <Route path="/ui/chat-testing" element={<ProfessorChatTesting />} />
+              </Route>
+
+              {/* Public Routes */}
+              <Route path="/ui/api-example" element={<APIUsageExample />} />
+
             </Routes>
           </div>
         </div>

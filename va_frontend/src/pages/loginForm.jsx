@@ -10,32 +10,32 @@ function LoginForm() {
   const { loginUser } = useAPI();  // Use the loginUser function from API service
   const navigate = useNavigate();  // Initialize navigate
 
-  // Handle Sign In button click
-  const handleSubmit = async () => {
-    if (!username || !password) {
-      setResponseMessage("Both username and password are required.");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!username || !password) {
+    setResponseMessage("Both username and password are required.");
+    return;
+  }
 
-    try {
-      const response = await loginUser(username, password);  // Use the loginUser method
-      if (response.message === "student") {
+  try {
+    const response = await loginUser(username, password);  // Call backend login API
+
+    if (response.token) {
+      localStorage.setItem("token", response.token);  // Store token
+      localStorage.setItem("role", response.role);  // Store role
+
+      if (response.role === "student") {
         navigate('/ui/chat');  // Navigate to student chat
-      }
-      if (response.message === "professor") {
+      } else if (response.role === "professor") {
         navigate('/ui/professor-dashboard');  // Navigate to professor dashboard
       }
-      if (response.error) {
-        setResponseMessage(response.error);  // If there's an error from the backend
-      } else {
-        console.log("Login successful", response.message);  // Handle success
-        setResponseMessage(response.message);  // Set the response message for success
-      }
-    } catch (error) {
-      setResponseMessage("Error occurred while logging in.");  // Set error message in case of an exception
-      console.error("Login error", error);
+    } else {
+      setResponseMessage(response.error || "Invalid login credentials.");
     }
-  };
+  } catch (error) {
+    setResponseMessage("Error occurred while logging in.");
+    console.error("Login error", error);
+  }
+};
 
   return (
     <div className="login-container">
