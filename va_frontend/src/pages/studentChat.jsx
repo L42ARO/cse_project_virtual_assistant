@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./studentChat.css";
@@ -17,6 +17,7 @@ function StudentChat() {
     const [selectedCourse, setSelectedCourse] = useState("Select a Course");
     const [chatHistory, setChatHistory] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
+    const chatBoxRef = useRef(null); 
 
 
     const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
@@ -87,6 +88,13 @@ function StudentChat() {
     }, [socket]);
 
     useEffect(() => {
+        if (chatBoxRef.current) {
+            chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+        }
+    }, [chatMessages]);
+    
+
+    useEffect(() => {
         // Reset chat-related state when course is changed
         setSelectedChat(null);
         setChatMessages([]);
@@ -154,7 +162,7 @@ function StudentChat() {
                 </div>
 
                 {/* Chat Box */}
-                <div className="student-chat-box">
+                <div className="student-chat-box" ref={chatBoxRef}>
                     {chatMessages.map((msg, index) => (
                         <ChatBubble 
                             key={index} 

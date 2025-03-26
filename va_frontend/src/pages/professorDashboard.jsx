@@ -15,7 +15,9 @@ function ProfessorDashboard() {
     const [courseId, setCourseId] = useState(null);
     const [selectedCourse, setSelectedCourse] = useState("Select a Course");
 
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef(null); // Reference to file input element
+ 
+    const chatBoxRef = useRef(null); // Reference to chat box div
 
     const professorCourses = ["CDA3103", "COP3330", "CEN4020"];
 
@@ -125,6 +127,13 @@ function ProfessorDashboard() {
     }, [socket]);
 
     useEffect(() => {
+        if (chatBoxRef.current) {
+            chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+        }
+    }, [chatMessages]);
+    
+
+    useEffect(() => {
             // Reset chat-related state when course is changed
             setChatMessages([]);
             setHasSentInitialMessage(false);
@@ -169,7 +178,7 @@ function ProfessorDashboard() {
                 </div>
 
                 {/* Chat Box */}
-                <div className="student-chat-box">
+                <div className="prof-chat-box" ref={chatBoxRef}>
                     {chatMessages.map((msg, index) => (
                         <ChatBubble 
                             key={index} 
