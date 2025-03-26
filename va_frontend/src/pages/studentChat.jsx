@@ -5,6 +5,7 @@ import "./studentChat.css";
 import CourseDropdown from "../components/CourseDropdown";
 import ChatBubble from "../components/ChatBubble";
 import ChatHistory from "../components/ChatHistory";
+import FlaggedQuestionList from "../components/FlaggedQuestionList";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -18,6 +19,27 @@ function StudentChat() {
     const [chatHistory, setChatHistory] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const chatBoxRef = useRef(null); 
+    const [flaggedQuestions, setFlaggedQuestions] = useState([
+        {
+            id: 1,
+            question: "Can you explain pipelining again?",
+            sentToProfessor: true,
+            professorReply: "Sure! Pipelining allows overlapping instruction execution.",
+            course: "CDA3103"
+        },
+        {
+            id: 2,
+            question: "Why does my code get a null pointer?",
+            sentToProfessor: true,
+            professorReply: null,
+            course: "COP3330"
+        }
+    ]);
+    const filteredFlaggedQuestions = flaggedQuestions.filter(
+        (q) => q.course === selectedCourse
+    );
+    
+       
 
 
     const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
@@ -188,6 +210,7 @@ function StudentChat() {
             {/* Sidebar - Flagged Questions */}
             <div className="student-right-sidebar">
                 <h2 className="student-sidebar-title">Flagged Questions</h2>
+                <FlaggedQuestionList flaggedQuestions={filteredFlaggedQuestions} />
             </div>
         </div>
     );
