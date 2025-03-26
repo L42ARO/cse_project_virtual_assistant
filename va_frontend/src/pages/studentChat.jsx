@@ -86,6 +86,15 @@ function StudentChat() {
         };
     }, [socket]);
 
+    useEffect(() => {
+        // Reset chat-related state when course is changed
+        setSelectedChat(null);
+        setChatMessages([]);
+        setSessionId(null);
+        setHasSentInitialMessage(false);
+        setChatInput("");
+    }, [selectedCourse]); 
+
     const handleSelectChat = (chat) => {
         setSelectedChat(chat);
     
@@ -104,7 +113,14 @@ function StudentChat() {
             setSessionId(chat.id);  // Simulate as session ID
         }
     };
+
+    const handleLogout = () => {
+        // Clear auth-related items from localStorage
+        localStorage.clear();
     
+        // Redirect to login
+        window.location.href = "/ui/login";
+    };
 
     return (
         <div className="student-chat-container">
@@ -119,6 +135,8 @@ function StudentChat() {
                     onSelectChat={handleSelectChat} 
                     selectedChat={selectedChat}
                 />
+
+                <button onClick={handleLogout} className="student-logout-button"> ← Log out </button>
             </div>
 
             <div className="student-main-content">
