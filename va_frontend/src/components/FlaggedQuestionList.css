@@ -1,0 +1,36 @@
+.flagged-questions-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .flagged-question-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .flagged-question-text {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  
+  .flagged-status {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .reply-pending {
+    font-style: italic;
+    color: #999;
+  }
+  
+  .reply-text {
+    margin-top: 4px;
+    background: #eef;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  
