@@ -4,6 +4,7 @@ import { useAPI } from "../context/apiService";
 import "./professorDashboard.css";
 import CourseDropdown from "../components/CourseDropdown";
 import ChatBubble from "../components/ChatBubble";
+import PopupModal from "../components/PopupModal";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
@@ -20,6 +21,21 @@ function ProfessorDashboard() {
     const chatBoxRef = useRef(null); // Reference to chat box div
 
     const [professorCourses, setProfessorCourses] = useState(["CDA3103", "COP3330", "CEN4020"]);
+
+    const [activePopup, setActivePopup] = useState(null);
+
+    const openPopup = (type) => setActivePopup(type);
+    const closePopup = () => setActivePopup(null);
+
+    const mockCourseFiles = {
+        CDA3103: ["Lecture1.pdf", "Pipelining_Notes.docx"],
+        COP3330: ["Assignment1.java", "OOP_Concepts.pdf"],
+        CEN4020: ["Project_Guidelines.pdf"]
+      };
+
+    const [aiSettings, setAISettings] = useState("Summarize before answering");
+
+      
 
     // Handle file selection
     const handleFileUpload = (event) => {
@@ -177,10 +193,10 @@ function ProfessorDashboard() {
             <div className="prof-sidebar">
                 <h2 className="prof-sidebar-title">Dashboard</h2>
                 <nav className="prof-nav-menu">
-                    <button className="prof-nav-item">👥 Student Activity</button>
-                    <button className="prof-nav-item">📝 Course Material</button>
-                    <button className="prof-nav-item">⚙️ AI Settings</button>
-                    <button className="prof-nav-item">🔔 Notifications</button>
+                    <button className="prof-nav-item" onClick={() => openPopup("studentActivity")}>👥 Student Activity</button>
+                    <button className="prof-nav-item" onClick={() => openPopup("courseMaterial")}>📝 Course Material</button>
+                    <button className="prof-nav-item" onClick={() => openPopup("aiSettings")}>⚙️ AI Settings</button>
+                    <button className="prof-nav-item" onClick={() => openPopup("notifications")}>🔔 Notifications</button>
                 </nav>
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
@@ -242,6 +258,40 @@ function ProfessorDashboard() {
                     {/* <button className="upload-button">⬆️</button> */}
                 </div>
             </div>
+            {/* Popup Modal */}
+            {activePopup === "courseMaterial" && (
+                <PopupModal title="Course Material" onClose={closePopup}>
+                    {selectedCourse !== "Select a Course" ? (
+                    <ul>
+                        {(mockCourseFiles[selectedCourse] || []).map((file, idx) => (
+                        <li key={idx}>{file}</li>
+                        ))}
+                    </ul>
+                    ) : (
+                    <p>Please select a course first.</p>
+                    )}
+                </PopupModal>
+                )}
+
+                {activePopup === "aiSettings" && (
+                <PopupModal title="AI Settings" onClose={closePopup}>
+                    <textarea
+                    className="ai-settings-textarea"
+                    value={aiSettings}
+                    onChange={(e) => setAISettings(e.target.value)}
+                    rows={4}
+                    />
+                    <button
+                    className="ai-settings-save-button"
+                    onClick={() => {
+                        // future: send `aiSettings` to backend
+                        closePopup();
+                    }}
+                    >
+                    Save Settings
+                    </button>
+                </PopupModal>
+                )}
         </div>
     );
 }

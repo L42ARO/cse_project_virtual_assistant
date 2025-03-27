@@ -145,3 +145,27 @@
   padding: 10px;
   overflow-y: auto;
 }
+
+.ai-settings-textarea {
+  width: 100%;
+  border-radius: 6px;
+  padding: 8px;
+  margin-right: 8px; /* Optional for right spacing */
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.ai-settings-save-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background-color: #475841;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ai-settings-save-button:hover {
+  background-color: #3b4837;
+}
