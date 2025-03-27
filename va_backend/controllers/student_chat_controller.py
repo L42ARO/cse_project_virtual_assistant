@@ -21,8 +21,17 @@ openai_course_assistants ={
 }
 
 openAiService = OpenAIService()
-sessions = {}
 sessionsService = SessionLoggingService()
+
+stored_sessions = sessionsService.get_sessions()
+sessions = {
+    session["session_id"]: {
+        "thread_id": session["thread_id"],
+        "username": session["username"],
+        "course_id": session["course_id"]
+    }
+    for session in stored_sessions
+}
 # azureAiService = OpenAIService("AZURE_OPENAI_API_KEY_1", "AZURE_OPENAI_API_ENDPOINT")
 
 @bp.route(f"{prefix}/sessions-get", methods=["POST"])
