@@ -13,7 +13,6 @@ from services.openai_service import OpenAIService  # Import the OpenAI service
 socketio = None
 bp = Blueprint("student_chat_controller", __name__)
 prefix = "/scc"
-sessions = []
 
 openai_course_assistants ={
     "CAP6317":["asst_En49aHCQ2EoTjPpDZNu20TIH","vs_67e32e6c2f7c8191aca9c3497fcbad14"],
@@ -65,7 +64,7 @@ def chat_start():
             thread_id = thread.id
             openAiService.add_message(thread_id, message)
             run = openAiService.run_thread(thread_id, assistant_id)
-            openAiService.wait_for_run(thread_id, run.id)
+            openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
             ai_response = openAiService.get_latest_response(thread_id)
         except Exception as e:
             ai_response = "AI Service is down"
@@ -151,9 +150,10 @@ def register_socketio_events(_socketio: SocketIO):
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             })
             # ✅ AI logic
+            message = f"I am a student. {message}. Again this is a student message, not the professor."
             openAiService.add_message(thread_id, message)
             run = openAiService.run_thread(thread_id, assistant_id)
-            openAiService.wait_for_run(thread_id, run.id)
+            openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
             ai_response = openAiService.get_latest_response(thread_id)
 
         except KeyError as e:
