@@ -19,7 +19,7 @@ function ProfessorDashboard() {
  
     const chatBoxRef = useRef(null); // Reference to chat box div
 
-    const professorCourses = ["CDA3103", "COP3330", "CEN4020"];
+    const [professorCourses, setProfessorCourses] = useState(["CDA3103", "COP3330", "CEN4020"]);
 
     // Handle file selection
     const handleFileUpload = (event) => {
@@ -140,6 +140,29 @@ function ProfessorDashboard() {
             setChatInput("");
         }, [selectedCourse]); 
 
+    const handleNewCourseClick = () => {
+        const name = prompt("Enter Course Name (e.g., CDA3103):");
+        if (!name) return;
+        
+        // Optional: you can also ask for section/term here if needed
+        
+        // Add to dropdown list
+        setProfessorCourses(prev => [...prev, name]);
+        
+        // Automatically select the new course
+        setSelectedCourse(name);
+        
+        // Reset chat and input
+        setChatMessages([]);
+        setChatInput("");
+        setHasSentInitialMessage(false);
+        
+        // Optionally simulate a course ID
+        const fakeCourseId = Date.now();
+        setCourseId(fakeCourseId);
+        };
+          
+
     const handleLogout = () => {
         // Clear auth-related items from localStorage
         localStorage.clear();
@@ -171,9 +194,11 @@ function ProfessorDashboard() {
                     </h1>
 
                     {/* Course Dropdown */}
-                    <CourseDropdown 
-                        courses={professorCourses} 
-                        onSelectCourse={setSelectedCourse} 
+                    <CourseDropdown
+                        courses={professorCourses}
+                        onSelectCourse={setSelectedCourse}
+                        onNewCourseClick={handleNewCourseClick}
+                        showNewCourseOption={true}
                     />
                 </div>
 

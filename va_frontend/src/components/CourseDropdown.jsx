@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./CourseDropdown.css";
 
-const CourseDropdown = ({ courses, onSelectCourse }) => {
+const CourseDropdown = ({ courses, onSelectCourse, onNewCourseClick, showNewCourseOption }) => {
   // State to keep track of the currently selected course
   const [selectedCourse, setSelectedCourse] = useState("Select a Course");
 
@@ -34,6 +34,16 @@ const CourseDropdown = ({ courses, onSelectCourse }) => {
               {course}
             </li>
           ))}
+
+          {/* Optionally render a "New Course" button */}
+          {showNewCourseOption && (
+            <li className="dropdown-item new-course" onClick={() => {
+              onNewCourseClick?.();
+              setIsOpen(false);
+            }}>
+              ＋ New Course
+            </li>
+          )}
         </ul>
       )}
     </div>
