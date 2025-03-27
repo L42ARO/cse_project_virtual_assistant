@@ -125,3 +125,7 @@ class OpenAIService:
             if msg.role == "assistant":
                 return msg.content[0].text.value
         return None
+
+    def get_assistant_instructions(self, assistant_id):
+        assistant = self.client.beta.assistants.retrieve(assistant_id)
+        return assistant.instructions

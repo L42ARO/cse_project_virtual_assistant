@@ -25,8 +25,8 @@ sessions = {}
 # azureAiService = OpenAIService("AZURE_OPENAI_API_KEY_1", "AZURE_OPENAI_API_ENDPOINT")
 
 
-@bp.route(f'{prefix}/start-chat', methods=["POST"])
-def start_chat():
+@bp.route(f'{prefix}/chat-start', methods=["POST"])
+def chat_start():
     global sessions
     try:
         data = request.get_json()
@@ -114,8 +114,8 @@ def register_socketio_events(_socketio: SocketIO):
     global socketio
     socketio = _socketio
     
-    @socketio.on("ws_scc_chat_req")
-    def handle_student_msg_req(data):
+    @socketio.on("ws_scc_chat_cont")
+    def handle_scc_chat_cont(data):
         try:
             chat_request = sccChatContReq(**data)
             message = chat_request.message

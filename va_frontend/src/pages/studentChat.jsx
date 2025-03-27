@@ -10,7 +10,7 @@ import NewChatButton from "../components/NewChatButton";
 
 function StudentChat() {
     const { socket } = useServer();
-    const { sccContChat, sccStartChat } = useAPI();
+    const { sccChatCont, sccChatStart } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -57,7 +57,7 @@ function StudentChat() {
         if (!chatInput.trim()) return;
 
         if (!hasSentInitialMessage) {
-            const response = await sccStartChat("user123", selectedCourse, chatInput, "12341235");
+            const response = await sccChatStart("user123", selectedCourse, chatInput, "12341235");
             if (response.data.session_id) {
                 setSessionId(response.data.session_id);
                 setHasSentInitialMessage(true);
@@ -65,7 +65,7 @@ function StudentChat() {
                 console.error("Failed to start chat:", response.error);
             }
         } else {
-            sccContChat(socket, sessionId, chatInput, "123456789");
+            sccChatCont(socket, sessionId, chatInput, "123456789");
         }
     };
 

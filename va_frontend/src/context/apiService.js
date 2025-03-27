@@ -28,7 +28,7 @@ export const useAPI = () => {
   };
 
   // Starts a student chat session
-  const sccStartChat = async (userId, courseId, initialMessage, token) => {
+  const sccChatStart = async (userId, courseId, initialMessage, token) => {
     const payload = {
       user_id: userId,
       token: token,
@@ -36,7 +36,7 @@ export const useAPI = () => {
       course_id: courseId,
     };
 
-    return await fetchAPI("/scc/start-chat", {
+    return await fetchAPI("/scc/chat-start", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export const useAPI = () => {
     });
   };
 
-  const sccContChat = (socket, session_id, message, token) => {
+  const sccChatCont= (socket, session_id, message, token) => {
     const payload = {
       token: token,
       session_id: session_id,
@@ -57,7 +57,7 @@ export const useAPI = () => {
       return;
     }
     // Emit the event to the server
-    socket.emit("ws_scc_chat_req", payload);
+    socket.emit("ws_scc_chat_cont", payload);
   };
 
   const pccContChat = (socket, session_id, message, key) => {
@@ -163,8 +163,8 @@ export const useAPI = () => {
     fetchHttpMessage,
     fetchDelayedHttpMessage,
     sendChatMessage,
-    sccStartChat, 
-    sccContChat,
+    sccChatStart, 
+    sccChatCont,
     pccContChat,
     createNewCourse, // New API function for creating a course
     uploadFile,// New API function for file uploads
