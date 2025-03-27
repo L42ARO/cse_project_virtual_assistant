@@ -62,6 +62,7 @@ def chat_start():
             })
             thread = openAiService.create_thread(vs_id)
             thread_id = thread.id
+            message = f"I am a student. {message}. Again this is a student message, not the professor. Remember you have access to the class files."
             openAiService.add_message(thread_id, message)
             run = openAiService.run_thread(thread_id, assistant_id)
             openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
@@ -150,7 +151,7 @@ def register_socketio_events(_socketio: SocketIO):
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             })
             # ✅ AI logic
-            message = f"I am a student. {message}. Again this is a student message, not the professor."
+            message = f"I am a student. {message}. Again this is a student message, not the professor. Remember you have access to the class files."
             openAiService.add_message(thread_id, message)
             run = openAiService.run_thread(thread_id, assistant_id)
             openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
