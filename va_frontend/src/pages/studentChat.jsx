@@ -10,7 +10,7 @@ import NewChatButton from "../components/NewChatButton";
 
 function StudentChat() {
     const { socket } = useServer();
-    const { sccChatCont, sccChatStart } = useAPI();
+    const { sccChatCont, sccChatStart, sccGetSessions, sccGetSessionMessages } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -46,18 +46,37 @@ function StudentChat() {
     const studentCourses = ["CAP6317", "CDA4213"];
 
     useEffect(() => {
-        const mockHistory = [
-            { id: 1, course: "CDA3103", timestamp: "2024-03-18T10:00:00Z" },
-            { id: 2, course: "COP3330", timestamp: "2024-03-19T12:15:00Z" }
-        ];
-        setChatHistory(mockHistory);
-    }, []);
+        const loadChatHistory = async () => {
+            const token = localStorage.getItem("token");
+            try {
+                const result = await sccGetSessions(token, selectedCourse);
+
+                if (result.data) {
+                    const sessions = result.data.map((session) => ({
+                        id: session.session_id,
+                        course: session.course_id,
+                        timestamp: session.timestamp,
+                        thread_id: session.thread_id
+                    }));
+                    setChatHistory(sessions);
+                } else {
+                    console.error("No session data found.");
+                }
+            } catch (err) {
+                console.error("Failed to load chat history:", err);
+            }
+        };
+
+        loadChatHistory();
+    }, [selectedCourse]);
+
 
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
 
+        const token = localStorage.getItem("token");
         if (!hasSentInitialMessage) {
-            const response = await sccChatStart("user123", selectedCourse, chatInput, "12341235");
+            const response = await sccChatStart("user123", selectedCourse, chatInput, token);
             if (response.data.session_id) {
                 setSessionId(response.data.session_id);
                 setHasSentInitialMessage(true);
@@ -65,7 +84,7 @@ function StudentChat() {
                 console.error("Failed to start chat:", response.error);
             }
         } else {
-            sccChatCont(socket, sessionId, chatInput, "123456789");
+            sccChatCont(socket, sessionId, chatInput, token);
         }
     };
 
@@ -149,21 +168,35 @@ function StudentChat() {
         setLastAIMessageTimestamp(null);
     }, [selectedCourse]);
 
-    const handleSelectChat = (chat) => {
-        setSelectedChat(chat);
+    const handleSelectChat = async (chat) => {
+        const token = localStorage.getItem("token");
 
         if (selectedChat && selectedChat.id === chat.id) {
+            // Deselecting current chat
             setSelectedChat(null);
             setChatMessages([]);
             setSessionId(null);
             setHasSentInitialMessage(false);
-        } else {
-            setSelectedChat(chat);
-            setChatMessages([]);
-            setHasSentInitialMessage(true);
-            setSessionId(chat.id);
+            return;
+        }
+
+        setSelectedChat(chat);
+        setChatMessages([]);
+        setHasSentInitialMessage(true);
+        setSessionId(chat.id);
+
+        try {
+            const result = await sccGetSessionMessages(token, chat.thread_id);
+            if (result.data) {
+                setChatMessages(result.data);
+            } else {
+                console.error("Failed to fetch chat messages:", result.error);
+            }
+        } catch (error) {
+            console.error("Error loading chat history:", error);
         }
     };
+
 
     const handleNewChat = () => {
         if (selectedCourse === "Select a Course") {

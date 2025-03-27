@@ -69,8 +69,9 @@ function ProfessorDashboard() {
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
 
+        const token = localStorage.getItem("token");
         if (!hasSentInitialMessage) {
-            const response = await pccChatStart("user123", selectedCourse, chatInput, "12341235");
+            const response = await pccChatStart("user123", selectedCourse, chatInput, token);
 
             if (response.data.session_id) {
                 setSessionId(response.data.session_id);
@@ -84,7 +85,7 @@ function ProfessorDashboard() {
                 console.error("No session ID set. Cannot continue chat.");
                 return;
             }
-            pccChatCont(socket, sessionId, chatInput, "123456789");
+            pccChatCont(socket, sessionId, chatInput, token);
         }
 
         setChatInput("");

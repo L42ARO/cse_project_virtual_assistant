@@ -112,6 +112,13 @@ def chat_start():
         course_id = chat_request.course_id
         token = chat_request.token
 
+        username = decode_token(token)
+        if username is None:
+            return http_response(
+                message="Unauthorized",
+                status=503,
+                error="No username, token probably expired"
+            )
         
         if openai_course_assistants.get(course_id) is None:
             raise BadRequest
@@ -147,7 +154,7 @@ def chat_start():
             initFailedMessage = str(e)
 
 
-        sessions[session_id]={"thread":thread_id, "user_token":token, "course_id":course_id}
+        sessions[session_id]={"thread_id":thread_id, "username":token, "course_id":course_id}
         # Emit AI response to WebSocket
 
         timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
@@ -289,7 +296,7 @@ def register_socketio_events(_socketio: SocketIO):
         failed = False
         try:
             session = sessions[session_id]
-            thread_id = session["thread"]
+            thread_id = session["thread_id"]
             course_id = session["course_id"]
 
             if thread_id == "000":
