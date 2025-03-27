@@ -43,7 +43,7 @@ function StudentChat() {
         (q) => q.course === selectedCourse
     );
 
-    const studentCourses = ["CAP6317", "CDA3103", "COP3330", "CEN4020"];
+    const studentCourses = ["CAP6317", "CDA4213"];
 
     useEffect(() => {
         const mockHistory = [
