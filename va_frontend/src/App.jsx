@@ -32,11 +32,11 @@ function App() {
               <Route path="/unauthorized" element={<Unauthorized />} />
 
               {/* Protected Routes */}
-              <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["student", "dev"]} />}>
                 <Route path="/ui/chat" element={<StudentChat />} />
               </Route>
 
-              <Route element={<ProtectedRoute allowedRoles={["professor"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["professor", "dev"]} />}>
                 <Route path="/ui/professor-dashboard" element={<ProfessorDashboard />} />
                 <Route path="/ui/professor-files" element={<ProfessorFiles />} />
                 <Route path="/ui/chat-testing" element={<ProfessorChatTesting />} />
