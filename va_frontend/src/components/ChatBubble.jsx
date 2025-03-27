@@ -1,4 +1,5 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
 import "./ChatBubble.css";
 
 const ChatBubble = ({ sender, message, type }) => {
@@ -9,10 +10,10 @@ const ChatBubble = ({ sender, message, type }) => {
         <div className="message-bubble">
           {type === "file" ? (
             <>
-              📁 <span>{message}</span> {/* File icon and name */}
+              📁 <span>{message}</span>
             </>
           ) : (
-            message
+            <ReactMarkdown>{message}</ReactMarkdown>
           )}
         </div>
       </div>

@@ -28,10 +28,10 @@ export const useAPI = () => {
   };
 
   // Starts a student chat session
-  const sccStartChat = async (userId, courseId, initialMessage, key) => {
+  const sccStartChat = async (userId, courseId, initialMessage, token) => {
     const payload = {
       user_id: userId,
-      key: key,
+      token: token,
       initial_message: initialMessage.trim(),
       course_id: courseId,
     };
@@ -45,11 +45,11 @@ export const useAPI = () => {
     });
   };
 
-  const sccContChat = (socket, session_id, message, key) => {
+  const sccContChat = (socket, session_id, message, token) => {
     const payload = {
-      key:key,
-      message: message.trim(),
+      token: token,
       session_id: session_id,
+      message: message.trim(),
     };
 
     if (!socket) {

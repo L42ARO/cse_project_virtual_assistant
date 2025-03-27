@@ -17,7 +17,7 @@ bp = Blueprint("professor_chat_controller", __name__)
 prefix = "/pcc"
 
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY_1")
+api_key = os.getenv("AZURE_OPENAI_API_KEY_1")
 
 if not api_key:
     raise ValueError("❌ API key not found! Check your .env file.")
@@ -127,7 +127,8 @@ def register_socketio_events(_socketio: SocketIO):
         timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
         socketio.emit("ws_pcc_user_res", {"message": message, "timestamp": timestamp})
         try:
-            ai_response = add_message(user_id=session_id, user_message=message)
+            # ai_response = add_message(user_id=session_id, user_message=message)
+            pass
         except:
             ai_response = "Professor Azure is Down sorry!"
 
