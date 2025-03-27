@@ -1,0 +1,10 @@
+{
+  "CSE101": {
+    "assistant_id": "asst_e7OuUtpmQ1DOo9T1ltn7ZzY8",
+    "vector_store_id": "vs_67e3632985e8819180f1dbbea0a2cb3e",
+    "threads": {
+      "student_42": "thread_je6Wl8PNfKfeGnlHTKOulgNA"
+    },
+    "file_uploaded": true
+  }
+}
