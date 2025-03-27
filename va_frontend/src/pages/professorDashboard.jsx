@@ -22,7 +22,7 @@ function ProfessorDashboard() {
     const fileInputRef = useRef(null);
     const chatBoxRef = useRef(null);
 
-    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA3103", "COP3330"]);
+    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA4213"]);
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
