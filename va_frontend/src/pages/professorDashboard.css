@@ -27,20 +27,29 @@
 .prof-nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px;
 }
 
 .prof-nav-item {
   font-size: 16px;
-  color: #000;
-  padding: 10px;
-  border-radius: 5px;
+  color: white;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  background-color: #475841;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+  font-weight: 500;
 }
 
 .prof-nav-item:hover {
-  background-color: #475841;
-  color: white;
+  background-color: #394730;
+  color: #ffffff;
+  transform: translateX(4px);
+  transition: all 0.2s ease-in-out;
 }
+
 
 /* Logout Button */
 .prof-logout-button {

@@ -177,10 +177,10 @@ function ProfessorDashboard() {
             <div className="prof-sidebar">
                 <h2 className="prof-sidebar-title">Dashboard</h2>
                 <nav className="prof-nav-menu">
-                    <p className="prof-nav-item">🏠 Dashboard</p>
-                    <p className="prof-nav-item">👥 Student Activity</p>
-                    <p className="prof-nav-item">⚙️ AI Settings</p>
-                    <p className="prof-nav-item">🔔 Notifications</p>
+                    <button className="prof-nav-item">👥 Student Activity</button>
+                    <button className="prof-nav-item">📝 Course Material</button>
+                    <button className="prof-nav-item">⚙️ AI Settings</button>
+                    <button className="prof-nav-item">🔔 Notifications</button>
                 </nav>
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
