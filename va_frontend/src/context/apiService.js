@@ -60,6 +60,37 @@ export const useAPI = () => {
     socket.emit("ws_scc_chat_cont", payload);
   };
 
+const sccGetSessions = async (token, courseId = null) => {
+  const payload = {
+    token,
+  };
+  if (courseId) payload.course_id = courseId;
+
+  return await fetchAPI("/scc/sessions-get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+};
+
+const sccGetSessionMessages = async (token, threadId) => {
+  const payload = {
+    token,
+    thread_id: threadId,
+  };
+
+  return await fetchAPI("/scc/session-messages-get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+};
+
+
 const pccChatIntro = async (courseId, token) => {
   const payload = {
     course_id: courseId,
@@ -202,6 +233,8 @@ const pccChatIntro = async (courseId, token) => {
     createNewCourse, // New API function for creating a course
     uploadFile,// New API function for file uploads
     fetchUsers,
-    loginUser
+    loginUser,
+    sccGetSessions,
+    sccGetSessionMessages
   };
 };

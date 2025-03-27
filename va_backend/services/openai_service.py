@@ -286,3 +286,29 @@ class OpenAIService:
     def get_assistant_instructions(self, assistant_id):
         assistant = self.client.beta.assistants.retrieve(assistant_id)
         return assistant.instructions
+
+    def get_thread_messages(self, thread_id):
+        try:
+            messages = self.client.beta.threads.messages.list(thread_id=thread_id)
+            history = []
+
+            # Reverse to get chronological order (oldest first)
+            for msg in reversed(messages.data):
+                if msg.role == "user":
+                    history.append({
+                        "sender": "User",
+                        "message": msg.content[0].text.value,
+                        "timestamp": msg.created_at
+                    })
+                elif msg.role == "assistant":
+                    history.append({
+                        "sender": "AI",
+                        "message": msg.content[0].text.value,
+                        "timestamp": msg.created_at
+                    })
+
+            return history
+        except Exception as e:
+            print(f"L42: Failed to fetch messages for thread {thread_id}: {str(e)}")
+            return []
+ 

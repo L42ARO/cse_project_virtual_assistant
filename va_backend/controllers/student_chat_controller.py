@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime, timezone
 from utils.utils import *
 from services.openai_service import OpenAIService  # Import the OpenAI service
+from services.session_logging_service import *
 
 # Create a Blueprint
 socketio = None
@@ -21,7 +22,41 @@ openai_course_assistants ={
 
 openAiService = OpenAIService()
 sessions = {}
+sessionsService = SessionLoggingService()
 # azureAiService = OpenAIService("AZURE_OPENAI_API_KEY_1", "AZURE_OPENAI_API_ENDPOINT")
+
+@bp.route(f"{prefix}/sessions-get", methods=["POST"])
+def get_sessions():
+    try:
+        data = request.get_json()
+        if not data or "token" not in data:
+            raise BadRequest("Missing token")
+
+        token = data["token"]
+        username = decode_token(token)
+        if not username:
+            return http_response(
+                message="Unauthorized",
+                status=401,
+                error="Invalid or expired token"
+            )
+
+        course_id = data.get("course_id", None)
+
+        sessions_data = sessionsService.get_sessions(course_id=course_id, username=username)
+
+        return http_response(
+            message="Sessions retrieved successfully",
+            status=200,
+            data=sessions_data
+        )
+    except Exception as e:
+        return http_response(
+            message="Failed to retrieve sessions",
+            status=500,
+            error=str(e)
+        )
+
 
 
 @bp.route(f'{prefix}/chat-start', methods=["POST"])
@@ -41,6 +76,13 @@ def chat_start():
         session_id = str(uuid.uuid4())  # Generate UUID for session
         course_id = chat_request.course_id
         token = chat_request.token
+        username = decode_token(token)
+        if username is None:
+            return http_response(
+                message="Unauthorized",
+                status=503,
+                error="No username, token probably expired"
+            )
 
         
         if openai_course_assistants.get(course_id) is None:
@@ -73,7 +115,8 @@ def chat_start():
             initFailedMessage = str(e)
 
 
-        sessions[session_id]={"thread":thread_id, "user_token":token, "course_id":course_id}
+        sessions[session_id]={"thread_id":thread_id, "username":username, "course_id":course_id}
+        sessionsService.log_session(session_id, thread_id, username, course_id)
         # Emit AI response to WebSocket
 
         timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
@@ -109,6 +152,26 @@ def chat_start():
             error=str(e)
         )
 
+@bp.route(f"{prefix}/session-messages-get", methods=["POST"])
+def get_chat_history():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+        thread_id = data.get("thread_id")
+
+        username = decode_token(token)
+        if not username:
+            return http_response("Unauthorized", 401, "Invalid or expired token")
+
+        if not thread_id:
+            return http_response("Missing thread_id", 400)
+
+        history = openAiService.get_thread_messages(thread_id)
+        return http_response("Chat history retrieved", 200, data=history)
+    except Exception as e:
+        return http_response("Internal server error", 500, error=str(e))
+
+
 def register_socketio_events(_socketio: SocketIO):
     """Registers WebSocket event handlers."""
     global socketio
@@ -138,7 +201,7 @@ def register_socketio_events(_socketio: SocketIO):
         failed = False
         try:
             session = sessions[session_id]
-            thread_id = session["thread"]
+            thread_id = session["thread_id"]
             course_id = session["course_id"]
 
             if thread_id == "000":
