@@ -28,15 +28,15 @@ export const useAPI = () => {
   };
 
   // Starts a student chat session
-  const sccStartChat = async (userId, courseId, initialMessage, key) => {
+  const sccChatStart = async (userId, courseId, initialMessage, token) => {
     const payload = {
       user_id: userId,
-      key: key,
+      token: token,
       initial_message: initialMessage.trim(),
       course_id: courseId,
     };
 
-    return await fetchAPI("/scc/start-chat", {
+    return await fetchAPI("/scc/chat-start", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,11 +45,11 @@ export const useAPI = () => {
     });
   };
 
-  const sccContChat = (socket, session_id, message, key) => {
+  const sccChatCont= (socket, session_id, message, token) => {
     const payload = {
-      key:key,
-      message: message.trim(),
+      token: token,
       session_id: session_id,
+      message: message.trim(),
     };
 
     if (!socket) {
@@ -57,12 +57,43 @@ export const useAPI = () => {
       return;
     }
     // Emit the event to the server
-    socket.emit("ws_scc_chat_req", payload);
+    socket.emit("ws_scc_chat_cont", payload);
   };
 
-  const pccContChat = (socket, session_id, message, key) => {
+const pccChatIntro = async (courseId, token) => {
+  const payload = {
+    course_id: courseId,
+    token: token,
+  };
+
+  return await fetchAPI("/pcc/chat-intro", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+};
+
+  const pccChatStart = async (userId, courseId, initialMessage, token) => {
     const payload = {
-      key:key,
+      user_id: userId,
+      token: token,
+      initial_message: initialMessage.trim(),
+      course_id: courseId,
+    };
+
+    return await fetchAPI("/pcc/chat-start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  };
+  const pccChatCont = (socket, session_id, message, token) => {
+    const payload = {
+      token:token,
       message: message.trim(),
       session_id: session_id,
     };
@@ -72,7 +103,7 @@ export const useAPI = () => {
       return;
     }
     // Emit the event to the server
-    socket.emit("ws_pcc_chat_req", payload);
+    socket.emit("ws_pcc_chat_cont", payload);
   };
   // Creates a new course (Professor API)
   const createNewCourse = async (professorId, key, initialMessage, courseName, courseSection, courseTerm) => {
@@ -163,9 +194,11 @@ export const useAPI = () => {
     fetchHttpMessage,
     fetchDelayedHttpMessage,
     sendChatMessage,
-    sccStartChat, 
-    sccContChat,
-    pccContChat,
+    sccChatStart, 
+    sccChatCont,
+    pccChatIntro,
+    pccChatStart,
+    pccChatCont,
     createNewCourse, // New API function for creating a course
     uploadFile,// New API function for file uploads
     fetchUsers,

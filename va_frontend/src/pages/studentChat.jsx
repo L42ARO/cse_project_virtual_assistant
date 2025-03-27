@@ -10,7 +10,7 @@ import NewChatButton from "../components/NewChatButton";
 
 function StudentChat() {
     const { socket } = useServer();
-    const { sccContChat, sccStartChat } = useAPI();
+    const { sccChatCont, sccChatStart } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -19,7 +19,10 @@ function StudentChat() {
     const [selectedCourse, setSelectedCourse] = useState("Select a Course");
     const [chatHistory, setChatHistory] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
-    const chatBoxRef = useRef(null); 
+    const chatBoxRef = useRef(null);
+    const [lastStandbyTimestamp, setLastStandbyTimestamp] = useState(null);
+    const [lastAIMessageTimestamp, setLastAIMessageTimestamp] = useState(null);
+
     const [flaggedQuestions, setFlaggedQuestions] = useState([
         {
             id: 1,
@@ -40,42 +43,36 @@ function StudentChat() {
         (q) => q.course === selectedCourse
     );
 
-    const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
+    const studentCourses = ["CAP6317", "CDA3103", "COP3330", "CEN4020"];
 
     useEffect(() => {
-        // Temporary mock history (will replace with real API later)
         const mockHistory = [
             { id: 1, course: "CDA3103", timestamp: "2024-03-18T10:00:00Z" },
             { id: 2, course: "COP3330", timestamp: "2024-03-19T12:15:00Z" }
         ];
         setChatHistory(mockHistory);
-    }, []); 
-    
-    // Handles sending the first message
+    }, []);
+
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
 
         if (!hasSentInitialMessage) {
-            // Start a new chat session
-            const response = await sccStartChat("user123", "course456", chatInput, "123456789");
+            const response = await sccChatStart("user123", selectedCourse, chatInput, "12341235");
             if (response.data.session_id) {
-                setSessionId(response.session_id);
+                setSessionId(response.data.session_id);
                 setHasSentInitialMessage(true);
             } else {
                 console.error("Failed to start chat:", response.error);
             }
+        } else {
+            sccChatCont(socket, sessionId, chatInput, "123456789");
         }
-        else{
-            const response = sccContChat(socket,"123456", chatInput, "123456789");
-        }
-
-        setChatInput(""); // Clear input field after submission
     };
-    useEffect(()=>{
-        handleSendMessage();
-    },[]);
 
-    // Handle Enter Key Press
+    useEffect(() => {
+        handleSendMessage();
+    }, []);
+
     const handleKeyDown = (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -83,54 +80,79 @@ function StudentChat() {
         }
     };
 
-    // Handles incoming messages and ensures correct order
     const handleIncomingMessage = (data, sender) => {
+        if (data.failed) {
+            console.error(data.details);
+        }
+
+        const newMessage = {
+            message: data.message,
+            sender,
+            timestamp: data.timestamp
+        };
+
         setChatMessages((prev) => {
-            const updatedMessages = [...prev, { message: data.message, sender, timestamp: data.timestamp }];
+            const updatedMessages = [...prev, newMessage];
             return updatedMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         });
     };
 
-    // Listen for WebSocket messages
     useEffect(() => {
         if (!socket) return;
 
-        const handleAIResponse = (data) => handleIncomingMessage(data, "AI");
-        const handleUserResponse = (data) => handleIncomingMessage(data, "User");
+        const handleAIResponse = (data) => {
+            handleIncomingMessage(data, "AI");
+            setLastAIMessageTimestamp(data.timestamp);
+
+            // If AI response is after standby, clear standby
+            if (lastStandbyTimestamp && new Date(data.timestamp) > new Date(lastStandbyTimestamp)) {
+                setLastStandbyTimestamp(null);
+            }
+        };
+
+        const handleUserResponse = (data) => {
+            handleIncomingMessage(data, "User");
+            setChatInput("");
+        };
+
+        const handleStandby = (data) => {
+            const standbyTime = new Date(data.timestamp);
+            if (!lastAIMessageTimestamp || standbyTime > new Date(lastAIMessageTimestamp)) {
+                setLastStandbyTimestamp(data.timestamp);
+            }
+        };
 
         socket.on("ws_scc_ai_res", handleAIResponse);
         socket.on("ws_scc_user_res", handleUserResponse);
+        socket.on("ws_scc_ai_stdby", handleStandby);
 
         return () => {
             socket.off("ws_scc_ai_res", handleAIResponse);
             socket.off("ws_scc_user_res", handleUserResponse);
+            socket.off("ws_scc_ai_stdby", handleStandby);
         };
-    }, [socket]);
+    }, [socket, lastAIMessageTimestamp, lastStandbyTimestamp]);
 
-    // handle scroll to bottom of chat box
     useEffect(() => {
         if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
-    }, [chatMessages]);
-    
-    // Reset chat-related state when course is changed
+    }, [chatMessages, lastStandbyTimestamp]);
+
     useEffect(() => {
         setSelectedChat(null);
         setChatMessages([]);
         setSessionId(null);
         setHasSentInitialMessage(false);
         setChatInput("");
-    }, [selectedCourse]); 
+        setLastStandbyTimestamp(null);
+        setLastAIMessageTimestamp(null);
+    }, [selectedCourse]);
 
-    // Handle selecting and deselecting a chat session
     const handleSelectChat = (chat) => {
         setSelectedChat(chat);
-    
-        // TODO: Load chat messages for the selected chat session from backend
-        // For now, we'll just clear and simulate:
+
         if (selectedChat && selectedChat.id === chat.id) {
-            // Unselect if same chat is clicked again
             setSelectedChat(null);
             setChatMessages([]);
             setSessionId(null);
@@ -139,64 +161,54 @@ function StudentChat() {
             setSelectedChat(chat);
             setChatMessages([]);
             setHasSentInitialMessage(true);
-            setSessionId(chat.id);  // Simulate as session ID
+            setSessionId(chat.id);
         }
     };
 
-    // Handle starting a new chat session
     const handleNewChat = () => {
         if (selectedCourse === "Select a Course") {
             alert("Please select a course before starting a new chat.");
             return;
         }
-    
-        // Start fresh session
+
         setSelectedChat(null);
         setChatMessages([]);
         setSessionId(null);
         setHasSentInitialMessage(false);
         setChatInput("");
-    
-        // Optionally generate a new chat ID
-        const newChatId = Date.now(); // use this to simulate a new session
-    
-        // Add to chat history
+        setLastStandbyTimestamp(null);
+        setLastAIMessageTimestamp(null);
+
+        const newChatId = Date.now();
         const newChat = {
             id: newChatId,
             course: selectedCourse,
             timestamp: new Date().toISOString()
         };
-    
+
         setChatHistory(prev => [...prev, newChat]);
-        setSessionId(newChatId); // simulate the session ID until backend is ready
+        setSessionId(newChatId);
     };
 
-    // Handle logging out
     const handleLogout = () => {
-        // Clear auth-related items from localStorage
         localStorage.clear();
-    
-        // Redirect to login
         window.location.href = "/ui/login";
     };
 
+    const shouldShowStandby = lastStandbyTimestamp &&
+        (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
+
     return (
         <div className="student-chat-container">
-            {/* Main Chat Section */}
             <div className="student-left-sidebar">
                 <div className="student-sidebar-content">
-                    {/* Title of the chat history section */}
                     <h2 className="student-sidebar-title">Chat History</h2>
-
-                    {/* New Chat Button */}
                     <NewChatButton onNewChat={handleNewChat} />
-
-                    {/* Sidebar - Chat History */}
-                    <ChatHistory 
+                    <ChatHistory
                         chatSessions={chatHistory
                             .filter(chat => chat.course === selectedCourse)
                             .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))}
-                        onSelectChat={handleSelectChat} 
+                        onSelectChat={handleSelectChat}
                         selectedChat={selectedChat}
                     />
                 </div>
@@ -204,31 +216,34 @@ function StudentChat() {
             </div>
 
             <div className="student-main-content">
-                {/* Header */}
                 <div className="student-header">
                     <h1 className="student-header-title">
                         {selectedCourse !== "Select a Course" ? `${selectedCourse} - Virtual Assistant` : "Virtual Assistant"}
                     </h1>
-                    
-                    {/* Course Dropdown */}
-                    <CourseDropdown 
-                        courses={studentCourses} 
-                        onSelectCourse={setSelectedCourse} 
+                    <CourseDropdown
+                        courses={studentCourses}
+                        onSelectCourse={setSelectedCourse}
                     />
                 </div>
 
-                {/* Chat Box */}
                 <div className="student-chat-box" ref={chatBoxRef}>
                     {chatMessages.map((msg, index) => (
-                        <ChatBubble 
-                            key={index} 
-                            sender={msg.sender} 
-                            message={msg.message} 
+                        <ChatBubble
+                            key={index}
+                            sender={msg.sender}
+                            message={msg.message}
                         />
                     ))}
+
+                    {shouldShowStandby && (
+                        <ChatBubble
+                            sender="AI"
+                            message="..."
+                        />
+                    )}
+
                 </div>
 
-                {/* Input Box */}
                 <div className="student-input-container">
                     <input
                         type="text"
@@ -241,7 +256,6 @@ function StudentChat() {
                 </div>
             </div>
 
-            {/* Sidebar - Flagged Questions */}
             <div className="student-right-sidebar">
                 <h2 className="student-sidebar-title">Flagged Questions</h2>
                 <FlaggedQuestionList flaggedQuestions={filteredFlaggedQuestions} />

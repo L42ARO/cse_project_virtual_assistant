@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 class sccChatContReq(BaseModel):
-    key: str
+    token: str
     session_id: str
     message : str

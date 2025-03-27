@@ -7,39 +7,39 @@ import ChatBubble from "../components/ChatBubble";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
-    const { createNewCourse, pccContChat } = useAPI();
+    const { createNewCourse, pccChatCont, pccChatStart, pccChatIntro } = useAPI();
 
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
+    const [sessionId, setSessionId] = useState(null);
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [courseId, setCourseId] = useState(null);
     const [selectedCourse, setSelectedCourse] = useState("Select a Course");
 
-    const fileInputRef = useRef(null); // Reference to file input element
- 
-    const chatBoxRef = useRef(null); // Reference to chat box div
+    const [lastStandbyTimestamp, setLastStandbyTimestamp] = useState(null);
+    const [lastAIMessageTimestamp, setLastAIMessageTimestamp] = useState(null);
 
-    const [professorCourses, setProfessorCourses] = useState(["CDA3103", "COP3330", "CEN4020"]);
+    const fileInputRef = useRef(null);
+    const chatBoxRef = useRef(null);
 
-    // Handle file selection
+    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA3103", "COP3330"]);
+
+    const shouldShowStandby = lastStandbyTimestamp &&
+        (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
+
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
-
         if (!file) return;
 
-        // Create a file message object
         const fileMessage = {
-            message: file.name,  // Display the file name
+            message: file.name,
             sender: "Professor",
             timestamp: new Date().toISOString(),
-            type: "file"  // Mark it as a file type
+            type: "file"
         };
 
-        // Add the file message to chat history
         setChatMessages((prev) => [...prev, fileMessage]);
 
-
-        // Convert the file to a blob and upload it to the server
         const fileBlob = new Blob([file], { type: file.type });
         uploadFileToServer(fileBlob, file.name);
     };
@@ -47,7 +47,7 @@ function ProfessorDashboard() {
     const uploadFileToServer = async (fileBlob, fileName) => {
         const formData = new FormData();
         formData.append("file", fileBlob, fileName);
-        formData.append("course_id", "your_course_id");  // Replace with actual course ID
+        formData.append("course_id", "your_course_id");
 
         try {
             const response = await fetch("http://localhost:8000/pcc/upload-file", {
@@ -66,35 +66,30 @@ function ProfessorDashboard() {
         }
     };
 
-    // Handles sending the first message
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
 
         if (!hasSentInitialMessage) {
-            // Start a new course chat session
-            const response = await createNewCourse(
-                "prof123", // Replace with actual professor ID
-                "some-key", // Replace with actual authentication key
-                chatInput,
-                "CDA3103", // Course Name
-                "A", // Section
-                "Spring 2025" // Term
-            );
+            const response = await pccChatStart("user123", selectedCourse, chatInput, "12341235");
 
-            if (response.data.course_id) {
-                setCourseId(response.course_id);
+            if (response.data.session_id) {
+                setSessionId(response.data.session_id);
                 setHasSentInitialMessage(true);
             } else {
-                console.error("Failed to start course chat:", response.error);
+                console.error("Failed to start chat:", response.error);
+                return;
             }
+        } else {
+            if (!sessionId) {
+                console.error("No session ID set. Cannot continue chat.");
+                return;
+            }
+            pccChatCont(socket, sessionId, chatInput, "123456789");
         }
-        else{
-            const response = pccContChat(socket, "12341234", chatInput, "123456789")
-        }
-        setChatInput(""); // Clear input after sending
+
+        setChatInput("");
     };
 
-    // Handle Enter Key Press
     const handleKeyDown = (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -102,78 +97,110 @@ function ProfessorDashboard() {
         }
     };
 
-    // Handles incoming messages and ensures correct order
     const handleIncomingMessage = (data, sender) => {
+        const newMessage = {
+            message: data.message,
+            sender,
+            timestamp: data.timestamp
+        };
+
         setChatMessages((prev) => {
-            const updatedMessages = [...prev, { message: data.message, sender, timestamp: data.timestamp }];
+            const updatedMessages = [...prev, newMessage];
             return updatedMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         });
     };
 
-    // Listen for WebSocket messages
     useEffect(() => {
         if (!socket) return;
 
-        const handleAIResponse = (data) => handleIncomingMessage(data, "AI");
-        const handleUserResponse = (data) => handleIncomingMessage(data, "Professor");
+        const handleAIResponse = (data) => {
+            handleIncomingMessage(data, "AI");
+            setLastAIMessageTimestamp(data.timestamp);
+
+            if (lastStandbyTimestamp && new Date(data.timestamp) > new Date(lastStandbyTimestamp)) {
+                setLastStandbyTimestamp(null);
+            }
+        };
+
+        const handleUserResponse = (data) => {
+            handleIncomingMessage(data, "Professor");
+            setChatInput("");
+        };
+
+        const handleStandby = (data) => {
+            const standbyTime = new Date(data.timestamp);
+            if (!lastAIMessageTimestamp || standbyTime > new Date(lastAIMessageTimestamp)) {
+                setLastStandbyTimestamp(data.timestamp);
+            }
+        };
 
         socket.on("ws_pcc_ai_res", handleAIResponse);
         socket.on("ws_pcc_user_res", handleUserResponse);
+        socket.on("ws_pcc_ai_stdby", handleStandby);
 
         return () => {
             socket.off("ws_pcc_ai_res", handleAIResponse);
             socket.off("ws_pcc_user_res", handleUserResponse);
+            socket.off("ws_pcc_ai_stdby", handleStandby);
         };
-    }, [socket]);
+    }, [socket, lastAIMessageTimestamp, lastStandbyTimestamp]);
 
     useEffect(() => {
         if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
-    }, [chatMessages]);
-    
+    }, [chatMessages, lastStandbyTimestamp]);
 
     useEffect(() => {
-            // Reset chat-related state when course is changed
-            setChatMessages([]);
-            setHasSentInitialMessage(false);
-            setChatInput("");
-        }, [selectedCourse]); 
+        setChatMessages([]);
+        setHasSentInitialMessage(false);
+        setChatInput("");
+        setSessionId(null);
+        setCourseId(null);
+        setLastStandbyTimestamp(null);
+        setLastAIMessageTimestamp(null);
+        if (selectedCourse && selectedCourse !== "Select a Course") {
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            console.error("No token found in localStorage");
+            return;
+          }
+
+          // Send the chat intro request
+          pccChatIntro(selectedCourse, token)
+            .then((res) => {
+              if (!res.ok) {
+                console.error("Intro message failed:", res.error);
+              }
+            })
+            .catch((err) => {
+              console.error("Error in chat intro:", err);
+            });
+        }
+    }, [selectedCourse]);
 
     const handleNewCourseClick = () => {
         const name = prompt("Enter Course Name (e.g., CDA3103):");
         if (!name) return;
-        
-        // Optional: you can also ask for section/term here if needed
-        
-        // Add to dropdown list
+
         setProfessorCourses(prev => [...prev, name]);
-        
-        // Automatically select the new course
         setSelectedCourse(name);
-        
-        // Reset chat and input
         setChatMessages([]);
         setChatInput("");
         setHasSentInitialMessage(false);
-        
-        // Optionally simulate a course ID
+
         const fakeCourseId = Date.now();
         setCourseId(fakeCourseId);
-        };
-          
+    };
 
     const handleLogout = () => {
-        // Clear auth-related items from localStorage
         localStorage.clear();
-    
-        // Redirect to login
         window.location.href = "/ui/login";
     };
 
     return (
         <div className="prof-dashboard-container">
-            {/* Sidebar */}
             <div className="prof-sidebar">
                 <h2 className="prof-sidebar-title">Dashboard</h2>
                 <nav className="prof-nav-menu">
@@ -185,15 +212,11 @@ function ProfessorDashboard() {
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
 
-            {/* Main Content */}
             <div className="prof-main-content">
-                {/* Header */}
                 <div className="prof-header">
                     <h1 className="prof-header-title">
                         {selectedCourse !== "Select a Course" ? `${selectedCourse} - Virtual Assistant` : "Virtual Assistant"}
                     </h1>
-
-                    {/* Course Dropdown */}
                     <CourseDropdown
                         courses={professorCourses}
                         onSelectCourse={setSelectedCourse}
@@ -202,19 +225,24 @@ function ProfessorDashboard() {
                     />
                 </div>
 
-                {/* Chat Box */}
                 <div className="prof-chat-box" ref={chatBoxRef}>
                     {chatMessages.map((msg, index) => (
-                        <ChatBubble 
-                            key={index} 
-                            sender={msg.sender} 
-                            message={msg.message} 
-                            type={msg.type} 
+                        <ChatBubble
+                            key={index}
+                            sender={msg.sender}
+                            message={msg.message}
+                            type={msg.type}
                         />
                     ))}
+
+                    {shouldShowStandby && (
+                        <ChatBubble
+                            sender="AI"
+                            message="..."
+                        />
+                    )}
                 </div>
 
-                {/* Input Box */}
                 <div className="prof-input-container">
                     <input
                         type="text"
@@ -224,28 +252,22 @@ function ProfessorDashboard() {
                         onChange={(e) => setChatInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                    {/* Hidden file input */}
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      style={{ display: 'none' }} 
-                      onChange={handleFileUpload} 
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleFileUpload}
                     />
-
-                    {/* Upload Button */}
-                    <button 
-                      className="prof-upload-button" 
-                      onClick={() => fileInputRef.current.click()}
+                    <button
+                        className="prof-upload-button"
+                        onClick={() => fileInputRef.current.click()}
                     >
-                      ⬆️
+                        ⬆️
                     </button>
-                    {/* <button className="upload-button">⬆️</button> */}
                 </div>
             </div>
         </div>
     );
 }
 
-
 export default ProfessorDashboard;
-
