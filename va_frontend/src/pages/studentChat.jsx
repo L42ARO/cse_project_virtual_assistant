@@ -6,6 +6,7 @@ import CourseDropdown from "../components/CourseDropdown";
 import ChatBubble from "../components/ChatBubble";
 import ChatHistory from "../components/ChatHistory";
 import FlaggedQuestionList from "../components/FlaggedQuestionList";
+import NewChatButton from "../components/NewChatButton";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -38,9 +39,6 @@ function StudentChat() {
     const filteredFlaggedQuestions = flaggedQuestions.filter(
         (q) => q.course === selectedCourse
     );
-    
-       
-
 
     const studentCourses = ["CDA3103", "COP3330", "CEN4020"];
 
@@ -51,8 +49,8 @@ function StudentChat() {
             { id: 2, course: "COP3330", timestamp: "2024-03-19T12:15:00Z" }
         ];
         setChatHistory(mockHistory);
-    }, []);    
-
+    }, []); 
+    
     // Handles sending the first message
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
@@ -109,15 +107,15 @@ function StudentChat() {
         };
     }, [socket]);
 
+    // handle scroll to bottom of chat box
     useEffect(() => {
         if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
     }, [chatMessages]);
     
-
+    // Reset chat-related state when course is changed
     useEffect(() => {
-        // Reset chat-related state when course is changed
         setSelectedChat(null);
         setChatMessages([]);
         setSessionId(null);
@@ -125,6 +123,7 @@ function StudentChat() {
         setChatInput("");
     }, [selectedCourse]); 
 
+    // Handle selecting and deselecting a chat session
     const handleSelectChat = (chat) => {
         setSelectedChat(chat);
     
@@ -144,6 +143,35 @@ function StudentChat() {
         }
     };
 
+    // Handle starting a new chat session
+    const handleNewChat = () => {
+        if (selectedCourse === "Select a Course") {
+            alert("Please select a course before starting a new chat.");
+            return;
+        }
+    
+        // Start fresh session
+        setSelectedChat(null);
+        setChatMessages([]);
+        setSessionId(null);
+        setHasSentInitialMessage(false);
+        setChatInput("");
+    
+        // Optionally generate a new chat ID
+        const newChatId = Date.now(); // use this to simulate a new session
+    
+        // Add to chat history
+        const newChat = {
+            id: newChatId,
+            course: selectedCourse,
+            timestamp: new Date().toISOString()
+        };
+    
+        setChatHistory(prev => [...prev, newChat]);
+        setSessionId(newChatId); // simulate the session ID until backend is ready
+    };
+
+    // Handle logging out
     const handleLogout = () => {
         // Clear auth-related items from localStorage
         localStorage.clear();
@@ -160,9 +188,14 @@ function StudentChat() {
                     {/* Title of the chat history section */}
                     <h2 className="student-sidebar-title">Chat History</h2>
 
+                    {/* New Chat Button */}
+                    <NewChatButton onNewChat={handleNewChat} />
+
                     {/* Sidebar - Chat History */}
                     <ChatHistory 
-                        chatSessions={chatHistory.filter(chat => chat.course === selectedCourse)}
+                        chatSessions={chatHistory
+                            .filter(chat => chat.course === selectedCourse)
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))}
                         onSelectChat={handleSelectChat} 
                         selectedChat={selectedChat}
                     />
