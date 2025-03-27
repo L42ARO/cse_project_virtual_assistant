@@ -16,7 +16,9 @@ function StudentChat() {
     const [chatInput, setChatInput] = useState("");
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [sessionId, setSessionId] = useState(null);
-    const [selectedCourse, setSelectedCourse] = useState("Select a Course");
+    const studentCourses = ["CAP6317", "CDA4213"];
+    const [selectedCourse, setSelectedCourse] = useState(studentCourses[0]);
+
     const [chatHistory, setChatHistory] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const chatBoxRef = useRef(null);
@@ -43,7 +45,6 @@ function StudentChat() {
         (q) => q.course === selectedCourse
     );
 
-    const studentCourses = ["CAP6317", "CDA4213"];
 
     useEffect(() => {
         const loadChatHistory = async () => {
@@ -255,8 +256,10 @@ function StudentChat() {
                     </h1>
                     <CourseDropdown
                         courses={studentCourses}
+                        value={selectedCourse} // pass current selected course down
                         onSelectCourse={setSelectedCourse}
                     />
+
                 </div>
 
                 <div className="student-chat-box" ref={chatBoxRef}>

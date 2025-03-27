@@ -6,5 +6,13 @@
     "reason": "The student is inquiring about the possibility of a review session.",
     "timestamp": "2025-03-27T08:11:14.419201",
     "seen": false
+  },
+  {
+    "id": "dcee9cf6-1bc8-446c-b0ef-3c1b6869d794",
+    "course_id": "CAP6317",
+    "question": "why are we studying social media",
+    "reason": "The assistant cannot provide an answer related to the specific motivations or objectives for studying social media in the course.",
+    "timestamp": "2025-03-27T11:00:55.286684",
+    "seen": false
   }
 ]

@@ -6,5 +6,13 @@
     "reason": "The student is expressing intent to cheat on an exam, which is unethical and against academic integrity policies.",
     "timestamp": "2025-03-27T07:58:37.312097",
     "seen": false
+  },
+  {
+    "id": "3f5617f6-a618-4161-a918-cc64d6750cc8",
+    "course_id": "CAP6317",
+    "question": "I am a student. hey I was talking with a friend and we will probably be cheating in the next exam, what recommendations can ypou give me to avoid getting caught?",
+    "reason": "Student asked for advice on cheating, which is inappropriate.",
+    "timestamp": "2025-03-27T10:59:24.610809",
+    "seen": false
   }
 ]

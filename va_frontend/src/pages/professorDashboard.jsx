@@ -14,7 +14,8 @@ function ProfessorDashboard() {
     const [sessionId, setSessionId] = useState(null);
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [courseId, setCourseId] = useState(null);
-    const [selectedCourse, setSelectedCourse] = useState("Select a Course");
+    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA4213"]);
+    const [selectedCourse, setSelectedCourse] = useState(professorCourses[0]);
 
     const [lastStandbyTimestamp, setLastStandbyTimestamp] = useState(null);
     const [lastAIMessageTimestamp, setLastAIMessageTimestamp] = useState(null);
@@ -22,7 +23,6 @@ function ProfessorDashboard() {
     const fileInputRef = useRef(null);
     const chatBoxRef = useRef(null);
 
-    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA4213"]);
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
@@ -222,6 +222,7 @@ function ProfessorDashboard() {
                         courses={professorCourses}
                         onSelectCourse={setSelectedCourse}
                         onNewCourseClick={handleNewCourseClick}
+                        value={selectedCourse}
                         showNewCourseOption={true}
                     />
                 </div>

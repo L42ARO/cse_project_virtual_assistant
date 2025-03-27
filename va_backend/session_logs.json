@@ -19,5 +19,40 @@
     "username": "haliday",
     "course_id": "CAP6317",
     "timestamp": "2025-03-27T10:36:04.685530"
+  },
+  {
+    "session_id": "17ad24f5-f2aa-428c-86f3-a199fa7633b3",
+    "thread_id": "thread_27NkaV5h0ms7JTmCfrMGezA6",
+    "username": "student1",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T10:52:50.300021"
+  },
+  {
+    "session_id": "9815e98d-d24a-4810-9882-b4aa56162d7e",
+    "thread_id": "thread_4eHaPpDVN16TAxRlQWiHAx4W",
+    "username": "haliday",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T10:59:28.574418"
+  },
+  {
+    "session_id": "81f57391-6114-4fd9-af38-bc921d667aa9",
+    "thread_id": "thread_LWmaslrSE3FE3onjDhpV9wBn",
+    "username": "haliday",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T11:00:32.846089"
+  },
+  {
+    "session_id": "8a96d6a2-6281-47da-8f62-ff906e2305dc",
+    "thread_id": "thread_0IV4SBCC6ILyjamsAVg3olPf",
+    "username": "student1",
+    "course_id": "CDA4213",
+    "timestamp": "2025-03-27T11:18:46.974621"
+  },
+  {
+    "session_id": "d7b396a1-2539-4e6b-a907-651a456bf870",
+    "thread_id": "thread_giBKcaabaG3jhVdzisK0gaEt",
+    "username": "student1",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T11:23:33.528519"
   }
 ]
