@@ -14,5 +14,13 @@
     "reason": "The assistant cannot provide an answer related to the specific motivations or objectives for studying social media in the course.",
     "timestamp": "2025-03-27T11:00:55.286684",
     "seen": false
+  },
+  {
+    "id": "45eda96e-3cc4-4da4-99e3-d10cd5be8fa6",
+    "course_id": "CAP6317",
+    "question": "Why are we sudying the first topic of the syllabus, I don't get it?",
+    "reason": "The assistant cannot provide specific answers about the syllabus content and its relevance.",
+    "timestamp": "2025-03-27T13:09:48.966197",
+    "seen": false
   }
 ]

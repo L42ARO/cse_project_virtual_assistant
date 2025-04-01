@@ -61,5 +61,26 @@
     "username": "student1",
     "course_id": "CAP6317",
     "timestamp": "2025-03-27T11:36:15.959582"
+  },
+  {
+    "session_id": "fedec425-cb5c-4190-bde5-30103b672a25",
+    "thread_id": "thread_lfsZYCjAv5FqkLQCKw6QS5YN",
+    "username": "student1",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T12:33:56.732729"
+  },
+  {
+    "session_id": "1a4a3382-6595-491b-ad5d-6d471e149c7c",
+    "thread_id": "thread_yT8RnWuFkgDDjzmTmGbabIAi",
+    "username": "student1",
+    "course_id": "CDA4213",
+    "timestamp": "2025-03-27T12:56:53.604647"
+  },
+  {
+    "session_id": "e8a7b90c-125a-4fac-8308-2cddeda77643",
+    "thread_id": "thread_ZLPZx8BlihjBI8bNYtPM2OnJ",
+    "username": "student1",
+    "course_id": "CAP6317",
+    "timestamp": "2025-03-27T13:09:10.915170"
   }
 ]

@@ -17,7 +17,7 @@ prefix = "/scc"
 
 openai_course_assistants ={
     "CAP6317":["asst_En49aHCQ2EoTjPpDZNu20TIH","vs_67e32e6c2f7c8191aca9c3497fcbad14"],
-    "CDA4213":["asst_xRwMoWY4BRyaRWx6Xyr0BInY","vs_67e553465eb48191a316b7881d3db29c"]
+    "CDA4213":["asst_0Gad9IJGtpjrrhrtNE6bLCFV","vs_67e553465eb48191a316b7881d3db29c"]
 }
 
 openAiService = OpenAIService()
