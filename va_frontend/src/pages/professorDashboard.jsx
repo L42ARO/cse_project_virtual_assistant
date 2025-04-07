@@ -47,7 +47,7 @@ function ProfessorDashboard() {
     const uploadFileToServer = async (fileBlob, fileName) => {
         const formData = new FormData();
         formData.append("file", fileBlob, fileName);
-        formData.append("course_id", "your_course_id");
+        formData.append("course_id", selectedCourse);
 
         try {
             const response = await fetch("http://localhost:8000/pcc/upload-file", {

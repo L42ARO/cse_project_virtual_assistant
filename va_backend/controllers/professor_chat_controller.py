@@ -1,3 +1,4 @@
+import traceback
 import uuid
 import os
 from flask import Blueprint, request
@@ -36,7 +37,7 @@ client = AzureOpenAI(
 )
 
 # Replace with the actual vector store ID you want to update
-vector_store_id = "vs_vHqsM3doZ4TqM8RYAAuUpLUe"
+vector_store_id = "vs_67e32e6c2f7c8191aca9c3497fcbad14"
 
 openai_course_assistants ={
     "CAP6317":["asst_En49aHCQ2EoTjPpDZNu20TIH","vs_67e32e6c2f7c8191aca9c3497fcbad14"],
@@ -224,9 +225,9 @@ def new_course():
 
 @bp.route(f"{prefix}/upload-file", methods=["POST"])
 def upload_file():
-    """Handles file uploads and returns a randomly generated file ID."""
+    """Handles file uploads using OpenAIService functions and returns the file ID."""
     try:
-        print("Request received:", request.files, request.form)  # Debugging
+        print("Request received:", request.files, request.form)
 
         if "file" not in request.files:
             return http_response("Invalid request data", 400, error="No file provided")
@@ -237,33 +238,46 @@ def upload_file():
         if not course_id:
             return http_response("Invalid request data", 400, error="Missing course_id")
 
+        if course_id not in openai_course_assistants:
+            return http_response("Invalid request data", 400, error="Unknown course_id")
+
         if file.filename == "":
             return http_response("Invalid request data", 400, error="Empty file name")
 
-        # Ensure the uploads directory exists
-        upload_dir = "./uploads"
-        os.makedirs(upload_dir, exist_ok=True)  # Creates if it doesn't exist
+        # Ensure the file has a valid name and extension
+        filename = file.filename
+        name, ext = os.path.splitext(filename)
+        if not ext:
+            ext = ".txt"  # Default to .txt if no extension
+            filename = f"{filename}{ext}"
 
-        # Generate a mock Cloud File ID
-        file_id = str(uuid.uuid4())
+        allowed_exts = {
+            ".c", ".cs", ".cpp", ".doc", ".docx", ".html", ".java", ".json",
+            ".md", ".pdf", ".php", ".pptx", ".py", ".rb", ".tex", ".txt",
+            ".css", ".js", ".sh", ".ts"
+        }
+        if ext.lower() not in allowed_exts:
+            return http_response("Unsupported file type", 400, error=f"Extension {ext} not supported.")
 
-        # Save the file
-        file_path = os.path.join(upload_dir, f"{file_id}_{file.filename}")
-        file.save(file_path)
+        vector_store_id = openai_course_assistants[course_id][1]
 
-        # Update the vector store with the uploaded file
-        file_streams = [open(file_path, "rb")]
-        file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-            vector_store_id=vector_store_id, files=file_streams
-        )
+        # Pass the file as a tuple (filename, stream, content_type) if needed
+        file_response = openAiService.add_file((filename, file.stream, file.content_type or "application/octet-stream"))
+        file_id = file_response.id
+
+        vector_response = openAiService.add_file_to_vector_store(file_id, vector_store_id)
 
         print(f"Updated Vector Store ID: {vector_store_id}")
-        print("Upload Status:", file_batch.status)
-        print("File Counts:", file_batch.file_counts)
+        print("Upload Status:", getattr(vector_response, "status", "unknown"))
+        print("File Counts:", getattr(vector_response, "file_counts", {}))
 
         return http_response("File uploaded successfully", 200, data={"file_id": file_id})
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return http_response("Internal server error", 500, error=str(e))
+
+
 
 
 
