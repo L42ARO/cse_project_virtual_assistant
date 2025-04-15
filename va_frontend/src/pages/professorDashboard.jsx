@@ -4,6 +4,7 @@ import { useAPI } from "../context/apiService";
 import "./professorDashboard.css";
 import CourseDropdown from "../components/CourseDropdown";
 import ChatBubble from "../components/ChatBubble";
+import Modal from "../components/Modal";
 
 function ProfessorDashboard() {
     const { socket } = useServer();
@@ -23,6 +24,9 @@ function ProfessorDashboard() {
     const fileInputRef = useRef(null);
     const chatBoxRef = useRef(null);
 
+    const [modalType, setModalType] = useState(null);
+    const openModal = (type) => {setModalType(type)};
+    const closeModal = () => setModalType(null);
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
@@ -47,7 +51,7 @@ function ProfessorDashboard() {
     const uploadFileToServer = async (fileBlob, fileName) => {
         const formData = new FormData();
         formData.append("file", fileBlob, fileName);
-        formData.append("course_id", selectedCourse);
+        formData.append("course_id", "your_course_id");
 
         try {
             const response = await fetch("http://localhost:8000/pcc/upload-file", {
@@ -205,10 +209,10 @@ function ProfessorDashboard() {
             <div className="prof-sidebar">
                 <h2 className="prof-sidebar-title">Dashboard</h2>
                 <nav className="prof-nav-menu">
-                    <button className="prof-nav-item">👥 Student Activity</button>
-                    <button className="prof-nav-item">📝 Course Material</button>
-                    <button className="prof-nav-item">⚙️ AI Settings</button>
-                    <button className="prof-nav-item">🔔 Notifications</button>
+                    <button className="prof-nav-item" onClick={() => openModal("Student Activity")}>👥 Student Activity</button>
+                    <button className="prof-nav-item" onClick={() => openModal("Course Material")}>📝 Course Material</button>
+                    <button className="prof-nav-item" onClick={() => openModal("AI Settings")}>⚙️ AI Settings</button>
+                    <button className="prof-nav-item" onClick={() => openModal("Notifications")}>🔔 Notifications</button>
                 </nav>
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
@@ -268,6 +272,15 @@ function ProfessorDashboard() {
                     </button>
                 </div>
             </div>
+            {modalType && (
+                <Modal
+                    isOpen={!!modalType}
+                    title={modalType}
+                    onClose={closeModal}
+                >
+                    <p>Content for {modalType} goes here.</p>
+                </Modal>
+            )}
         </div>
     );
 }
