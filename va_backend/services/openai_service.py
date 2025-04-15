@@ -89,6 +89,7 @@ class OpenAIService:
     def list_files_in_vector_store(self, vector_store_id):
         return self.client.beta.vector_stores.files.list(vector_store_id=vector_store_id)
 
+
     # === Threads & Messages ===
 
     def create_thread(self, vector_store_id=None):
