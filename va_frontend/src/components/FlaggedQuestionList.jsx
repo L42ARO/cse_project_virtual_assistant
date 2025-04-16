@@ -12,7 +12,7 @@ const FlaggedQuestionList = ({ flaggedQuestions }) => {
                 <div key={fq.id} className="flagged-question-card">
                     <p className="flagged-question-text">📝 {fq.question}</p>
                     <p className="flagged-status">
-                        📤 Sent to professor: <strong>{fq.sentToProfessor ? "Yes" : "No"}</strong>
+                        📤 Sent to professor: <strong>{fq.sentToProfessor ? "✅" : "❌"}</strong>
                     </p>
                     {fq.professorReply ? (
                         <div className="flagged-reply">
