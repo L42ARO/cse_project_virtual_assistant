@@ -102,7 +102,10 @@
   width: 20%;
   background-color: #E6E8E6;
   padding: 20px;
+  max-height: 100vh;
+  overflow-y: auto; /* Enables vertical scrolling */
 }
+
 
 .student-sidebar-content {
   flex-grow: 1;
