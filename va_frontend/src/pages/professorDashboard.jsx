@@ -24,9 +24,71 @@ function ProfessorDashboard() {
     const fileInputRef = useRef(null);
     const chatBoxRef = useRef(null);
 
+    // Dummy flagged data (replace this with real API call later)
+    const dummyFlaggedData = {
+        mandatory: [
+            {
+                id: "m1",
+                course_id: "CAP6317",
+                question: "Why is AI alignment important?",
+                reason: "High-risk topic",
+                timestamp: "2025-04-10T10:00:00Z",
+                seen: false
+            },
+            {
+                id: "m2",
+                course_id: "CAP6317",
+                question: "What ethical risks exist in training LLMs?",
+                reason: "Sensitive subject",
+                timestamp: "2025-04-11T14:30:00Z",
+                seen: true
+            },
+            {
+                id: "m3",
+                course_id: "CDA4213",
+                question: "Can you explain the risks of overclocking a CPU?",
+                reason: "Hardware risk",
+                timestamp: "2025-04-13T09:15:00Z",
+                seen: false
+            },
+        ],
+        voluntary: [
+            {
+                id: "v1",
+                course_id: "CAP6317",
+                question: "Can you elaborate on transformer models?",
+                reason: "Student request",
+                timestamp: "2025-04-12T15:23:00Z",
+                seen: false
+            },
+            {
+                id: "v2",
+                course_id: "CAP6317",
+                question: "How does backpropagation work?",
+                reason: "Needs clarification",
+                timestamp: "2025-04-13T16:40:00Z",
+                seen: true
+            },
+            {
+                id: "v3",
+                course_id: "CDA4213",
+                question: "Can you revisit the topic of pipelining?",
+                reason: "Missed class",
+                timestamp: "2025-04-14T10:00:00Z",
+                seen: true
+            }
+        ]
+    };   
+
+
     const [modalType, setModalType] = useState(null);
+    const [flaggedData, setFlaggedData] = useState(dummyFlaggedData);
+    const [showSeen, setShowSeen] = useState(false);
     const openModal = (type) => {setModalType(type)};
     const closeModal = () => setModalType(null);
+    
+ 
+    
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
@@ -185,6 +247,18 @@ function ProfessorDashboard() {
         }
     }, [selectedCourse]);
 
+
+
+    useEffect(() => {
+        // Load all flags for the selected course into central state
+        const mandatory = dummyFlaggedData.mandatory.filter(f => f.course_id === selectedCourse);
+        const voluntary = dummyFlaggedData.voluntary.filter(f => f.course_id === selectedCourse);
+        setFlaggedData({ mandatory, voluntary });
+    }, [selectedCourse]);
+    
+    
+    
+
     const handleNewCourseClick = () => {
         const name = prompt("Enter Course Name (e.g., CDA3103):");
         if (!name) return;
@@ -212,7 +286,6 @@ function ProfessorDashboard() {
                     <button className="prof-nav-item" onClick={() => openModal("Student Activity")}>👥 Student Activity</button>
                     <button className="prof-nav-item" onClick={() => openModal("Course Material")}>📝 Course Material</button>
                     <button className="prof-nav-item" onClick={() => openModal("AI Settings")}>⚙️ AI Settings</button>
-                    <button className="prof-nav-item" onClick={() => openModal("Notifications")}>🔔 Notifications</button>
                 </nav>
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
@@ -272,13 +345,125 @@ function ProfessorDashboard() {
                     </button>
                 </div>
             </div>
-            {modalType && (
-                <Modal
-                    isOpen={!!modalType}
-                    title={modalType}
+            {/* Render modals conditionally based on modalType */}
+
+            {/* Student Activity Modal */}
+            {modalType === "Student Activity" && (
+                <Modal title="Student Activity" isOpen={!!modalType} onClose={closeModal}>
+                    <div style={{ marginBottom: "10px" }}>
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={showSeen}
+                        onChange={() => setShowSeen(prev => !prev)}
+                        style={{ marginRight: "5px" }}
+                        />
+                        Show Seen Flags
+                    </label>
+                    </div>
+
+                    <h3>📌 Mandatory Flags</h3>
+                    {flaggedData.mandatory
+                    .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
+                    .map((flag, index) => (
+                        <div key={flag.id} className="flag-box">
+                        <p><strong>Q:</strong> {flag.question}</p>
+                        <p><em>Reason:</em> {flag.reason}</p>
+                        <label>
+                            <input
+                            type="checkbox"
+                            checked={flag.seen}
+                            onChange={() => {
+                                const updated = {
+                                ...flaggedData,
+                                mandatory: flaggedData.mandatory.map(f =>
+                                    f.id === flag.id ? { ...f, seen: !f.seen } : f
+                                )
+                                };
+                                setFlaggedData(updated);
+                            }}
+                            />
+                            Mark as Seen
+                        </label>
+                        <hr />
+                        </div>
+                    ))}
+
+                    <h3>🙋 Voluntary Flags</h3>
+                    {flaggedData.voluntary
+                    .filter(f => f.course_id === selectedCourse && (showSeen || !f.seen))
+                    .map((flag, index) => (
+                        <div key={flag.id} className="flag-box">
+                        <p><strong>Q:</strong> {flag.question}</p>
+                        <p><em>Reason:</em> {flag.reason}</p>
+                        <label>
+                            <input
+                            type="checkbox"
+                            checked={flag.seen}
+                            onChange={() => {
+                                const updated = {
+                                ...flaggedData,
+                                voluntary: flaggedData.voluntary.map(f =>
+                                    f.id === flag.id ? { ...f, seen: !f.seen } : f
+                                )
+                                };
+                                setFlaggedData(updated);
+                            }}
+                            />
+                            Mark as Seen
+                        </label>
+
+                        <textarea
+                            rows={3}
+                            style={{ width: '100%', marginTop: '10px' }}
+                            placeholder="Write your reply here..."
+                            value={flag.reply || ""}
+                            onChange={(e) => {
+                            const updated = {
+                                ...flaggedData,
+                                voluntary: flaggedData.voluntary.map(f =>
+                                f.id === flag.id ? { ...f, reply: e.target.value } : f
+                                )
+                            };
+                            setFlaggedData(updated);
+                            }}
+                        />
+                        <button
+                            style={{ marginTop: '8px' }}
+                            onClick={() => {
+                            alert(`Reply sent: ${flag.reply || "[empty]"}`);
+                            const updated = {
+                                ...flaggedData,
+                                voluntary: flaggedData.voluntary.map(f =>
+                                f.id === flag.id ? { ...f, seen: true } : f
+                                )
+                            };
+                            setFlaggedData(updated);
+                            }}
+                        >
+                            Send Reply
+                        </button>
+                        <hr />
+                        </div>
+                    ))}
+                </Modal>
+                )}
+            {modalType === "Course Material" && (
+                <Modal 
+                    title="Course Material" 
+                    isOpen={!!modalType} 
                     onClose={closeModal}
                 >
-                    <p>Content for {modalType} goes here.</p>
+                    <p>Upload and manage course materials.</p>
+                </Modal>
+            )}
+            {modalType === "AI Settings" && (
+                <Modal 
+                    title="AI Settings" 
+                    isOpen={!!modalType} 
+                    onClose={closeModal}
+                >
+                    <p>Customize AI settings and preferences.</p>
                 </Modal>
             )}
         </div>
