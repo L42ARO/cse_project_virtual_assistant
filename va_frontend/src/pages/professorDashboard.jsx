@@ -86,9 +86,21 @@ function ProfessorDashboard() {
     const [showSeen, setShowSeen] = useState(false);
     const openModal = (type) => {setModalType(type)};
     const closeModal = () => setModalType(null);
-    
- 
-    
+
+    const dummyCourseMaterials = {
+        CAP6317: [
+            { fileName: "lecture1.pdf", uploadedAt: "2025-04-18T10:00:00Z" },
+            { fileName: "homework1.docx", uploadedAt: "2025-04-18T11:00:00Z" }
+        ],
+        CDA4213: [
+            { fileName: "week2-notes.txt", uploadedAt: "2025-04-19T09:30:00Z" }
+        ]
+    };
+
+    const [courseMaterials, setCourseMaterials] = useState({});
+    const [confirmDelete, setConfirmDelete] = useState({ show: false, file: null });
+
+
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
@@ -256,6 +268,11 @@ function ProfessorDashboard() {
         setFlaggedData({ mandatory, voluntary });
     }, [selectedCourse]);
     
+    useEffect(() => {
+        if (selectedCourse) {
+            setCourseMaterials(dummyCourseMaterials[selectedCourse] || []);
+        }
+    }, [selectedCourse]);
     
     
 
@@ -350,37 +367,45 @@ function ProfessorDashboard() {
             {/* Student Activity Modal */}
             {modalType === "Student Activity" && (
                 <Modal title="Student Activity" isOpen={!!modalType} onClose={closeModal}>
+
+                    {/* Toggle to show/hide seen flags */}
                     <div style={{ marginBottom: "10px" }}>
-                    <label>
-                        <input
-                        type="checkbox"
-                        checked={showSeen}
-                        onChange={() => setShowSeen(prev => !prev)}
-                        style={{ marginRight: "5px" }}
-                        />
-                        Show Seen Flags
-                    </label>
+                        <label>
+                            <input
+                            type="checkbox"
+                            checked={showSeen}
+                            onChange={() => setShowSeen(prev => !prev)} // toggle the showSeen state
+                            style={{ marginRight: "5px" }}
+                            />
+                            Show Seen Flags
+                        </label>
                     </div>
 
-                    <h3>📌 Mandatory Flags</h3>
+                    {/* Mandatory flags section */}
+                    <h3>Mandatory Flags</h3>
                     {flaggedData.mandatory
+                    // Only show flags from the selected course
+                    // If showSeen is true → show only seen flags; otherwise show only unseen
                     .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
-                    .map((flag, index) => (
+                    .map((flag) => (
                         <div key={flag.id} className="flag-box">
                         <p><strong>Q:</strong> {flag.question}</p>
                         <p><em>Reason:</em> {flag.reason}</p>
+
+                        {/* Checkbox to toggle seen status for this mandatory flag */}
                         <label>
                             <input
                             type="checkbox"
                             checked={flag.seen}
                             onChange={() => {
+                                // Create a new updated mandatory list with toggled seen for this flag
                                 const updated = {
                                 ...flaggedData,
                                 mandatory: flaggedData.mandatory.map(f =>
                                     f.id === flag.id ? { ...f, seen: !f.seen } : f
                                 )
                                 };
-                                setFlaggedData(updated);
+                                setFlaggedData(updated); // Update state with new list
                             }}
                             />
                             Mark as Seen
@@ -389,13 +414,18 @@ function ProfessorDashboard() {
                         </div>
                     ))}
 
-                    <h3>🙋 Voluntary Flags</h3>
+                    {/* Voluntary flags section */}
+                    <h3>Voluntary Flags</h3>
                     {flaggedData.voluntary
-                    .filter(f => f.course_id === selectedCourse && (showSeen || !f.seen))
-                    .map((flag, index) => (
+                    // Show only voluntary flags from the selected course
+                    // Show all if showSeen is true; else show only unseen ones
+                    .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
+                    .map((flag) => (
                         <div key={flag.id} className="flag-box">
                         <p><strong>Q:</strong> {flag.question}</p>
                         <p><em>Reason:</em> {flag.reason}</p>
+
+                        {/* Checkbox to manually toggle seen status for this voluntary flag */}
                         <label>
                             <input
                             type="checkbox"
@@ -407,18 +437,20 @@ function ProfessorDashboard() {
                                     f.id === flag.id ? { ...f, seen: !f.seen } : f
                                 )
                                 };
-                                setFlaggedData(updated);
+                                setFlaggedData(updated); // Save updated state
                             }}
                             />
                             Mark as Seen
                         </label>
 
+                        {/* Reply box to allow the professor to respond to this flagged question */}
                         <textarea
                             rows={3}
                             style={{ width: '100%', marginTop: '10px' }}
                             placeholder="Write your reply here..."
-                            value={flag.reply || ""}
+                            value={flag.reply || ""} // controlled input
                             onChange={(e) => {
+                            // Update the specific flag with new reply text
                             const updated = {
                                 ...flaggedData,
                                 voluntary: flaggedData.voluntary.map(f =>
@@ -428,17 +460,31 @@ function ProfessorDashboard() {
                             setFlaggedData(updated);
                             }}
                         />
+
+                        {/* Send button to simulate a reply being sent */}
                         <button
-                            style={{ marginTop: '8px' }}
+                            className="prof-reply-button"
                             onClick={() => {
+                            // Show an alert with the reply content
                             alert(`Reply sent: ${flag.reply || "[empty]"}`);
-                            const updated = {
+
+                            // Mark this specific flag as seen after the reply is "sent"
+                            const updatedVoluntaryFlags = flaggedData.voluntary.map((f) => {
+                                if (f.id === flag.id) {
+                                return {
+                                    ...f,
+                                    reply: flag.reply || "", // keep reply content
+                                    seen: true               // auto-mark as seen after replying
+                                };
+                                }
+                                return f; // don't change other flags
+                            });
+
+                            // Apply updated voluntary flags to global state
+                            setFlaggedData({
                                 ...flaggedData,
-                                voluntary: flaggedData.voluntary.map(f =>
-                                f.id === flag.id ? { ...f, seen: true } : f
-                                )
-                            };
-                            setFlaggedData(updated);
+                                voluntary: updatedVoluntaryFlags
+                            });
                             }}
                         >
                             Send Reply
@@ -447,16 +493,71 @@ function ProfessorDashboard() {
                         </div>
                     ))}
                 </Modal>
-                )}
-            {modalType === "Course Material" && (
-                <Modal 
-                    title="Course Material" 
-                    isOpen={!!modalType} 
-                    onClose={closeModal}
-                >
-                    <p>Upload and manage course materials.</p>
-                </Modal>
             )}
+            {modalType === "Course Material" && (
+                <Modal title="Course Material" isOpen={!!modalType} onClose={closeModal}>
+                {courseMaterials.length > 0 ? (
+                  <ul style={{ padding: 0, listStyle: "none", marginTop: "10px" }}>
+                    {courseMaterials.map((file, index) => {
+                      return (
+                        <li
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            padding: "8px 0",
+                            borderBottom: "1px solid #ccc",
+                          }}
+                        >
+                            <span>{file.fileName}</span>
+                            <button className="prof-delete-button"
+                                onClick={() => setConfirmDelete({ show: true, file })}
+                            >
+                                Delete
+                            </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p style={{ marginTop: "10px" }}>No files uploaded for this course.</p>
+                )}
+              </Modal>              
+            )}
+            {confirmDelete.show && (
+                <Modal
+                    title="Confirm Delete"
+                    isOpen={true}
+                    onClose={() => setConfirmDelete({ show: false, file: null })}
+                >
+                    <p>
+                    Are you sure you want to delete <strong>{confirmDelete.file.fileName}</strong>?
+                    </p>
+
+                    <div className="prof-modal-footer">
+                    <button
+                        className="prof-delete-button"
+                        onClick={() => {
+                        setCourseMaterials(prev =>
+                            prev.filter(f => f.fileName !== confirmDelete.file.fileName)
+                        );
+                        setConfirmDelete({ show: false, file: null });
+                        }}
+                    >
+                        Yes, Delete
+                    </button>
+
+                    <button
+                        className="prof-cancel-button"
+                        onClick={() => setConfirmDelete({ show: false, file: null })}
+                    >
+                        Cancel
+                    </button>
+                    </div>
+                </Modal>
+                )}
+
             {modalType === "AI Settings" && (
                 <Modal 
                     title="AI Settings" 
