@@ -1,99 +1,91 @@
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  animation: fadeIn 0.25s ease-out;
 }
-  
-  /* Modal Container */
-  .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;        
-    overflow-y: auto;        
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-    display: flex;
-    flex-direction: column;
+
+/* Modal Container */
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.25s ease-out;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Close Button */
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #222;
+  outline: none;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+  font-size: 16px;
+  color: #444;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  /* Modal Header */
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f4f4f4;
-    padding: 16px 20px;
-    border-bottom: 1px solid #ddd;
+  to {
+    opacity: 1;
   }
-  
-  .modal-title {
-    margin: 0;
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-15px);
+    opacity: 0;
   }
-  
-  /* Close Button */
-  .modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  /* Modal Body */
-  .modal-body {
-    padding: 20px;
-    font-size: 16px;
-    color: #444;
-  }
-  
-  /* Modal Footer */
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 16px 20px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #ddd;
-  }
-  
-  /* Buttons inside footer (optional global styles) */
-  .modal-footer button {
-    padding: 8px 16px;
-    font-size: 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background-color: #475841;
-    color: white;
-    transition: background-color 0.2s;
-  }
-  
-  .modal-footer button:hover {
-    background-color: #3a4635;
-  }
-  
-  /* Optional: Animation */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
+}
