@@ -100,7 +100,14 @@ function ProfessorDashboard() {
     const [courseMaterials, setCourseMaterials] = useState({});
     const [confirmDelete, setConfirmDelete] = useState({ show: false, file: null });
 
-
+    const dummyCourseInstructions = {
+        CAP6317: "You are an AI assistant helping students understand AI concepts clearly and concisely.",
+        CDA4213: "You are a virtual TA for computer architecture. Focus on clarity and technical depth."
+      };
+      
+      const [courseInstructions, setCourseInstructions] = useState(dummyCourseInstructions);
+      const [editedInstructions, setEditedInstructions] = useState(""); // stores textarea input
+      
 
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
@@ -273,8 +280,13 @@ function ProfessorDashboard() {
             setCourseMaterials(dummyCourseMaterials[selectedCourse] || []);
         }
     }, [selectedCourse]);
-    
-    
+
+    useEffect(() => {
+        if (modalType === "AI Settings" && selectedCourse) {
+          setEditedInstructions(courseInstructions[selectedCourse] || "");
+        }
+    }, [modalType, selectedCourse, courseInstructions]);
+
 
     const handleNewCourseClick = () => {
         const name = prompt("Enter Course Name (e.g., CDA3103):");
@@ -463,7 +475,7 @@ function ProfessorDashboard() {
 
                         {/* Send button to simulate a reply being sent */}
                         <button
-                            className="prof-reply-button"
+                            className="prof-button prof-reply-button"
                             onClick={() => {
                             // Show an alert with the reply content
                             alert(`Reply sent: ${flag.reply || "[empty]"}`);
@@ -511,7 +523,7 @@ function ProfessorDashboard() {
                           }}
                         >
                             <span>{file.fileName}</span>
-                            <button className="prof-delete-button"
+                            <button className="prof-button prof-delete-button"
                                 onClick={() => setConfirmDelete({ show: true, file })}
                             >
                                 Delete
@@ -537,7 +549,7 @@ function ProfessorDashboard() {
 
                     <div className="prof-modal-footer">
                     <button
-                        className="prof-delete-button"
+                        className="prof-button prof-delete-button"
                         onClick={() => {
                         setCourseMaterials(prev =>
                             prev.filter(f => f.fileName !== confirmDelete.file.fileName)
@@ -549,22 +561,47 @@ function ProfessorDashboard() {
                     </button>
 
                     <button
-                        className="prof-cancel-button"
+                        className= "prof-button prof-cancel-button"
                         onClick={() => setConfirmDelete({ show: false, file: null })}
                     >
                         Cancel
                     </button>
                     </div>
                 </Modal>
-                )}
+            )}
 
             {modalType === "AI Settings" && (
-                <Modal 
-                    title="AI Settings" 
-                    isOpen={!!modalType} 
-                    onClose={closeModal}
-                >
-                    <p>Customize AI settings and preferences.</p>
+                <Modal title="AI Settings" isOpen={!!modalType} onClose={closeModal}>
+                    <p>Customize the AI behavior for <strong>{selectedCourse}</strong>.</p>
+
+                    <textarea
+                        className="prof-ai-textarea"
+                        value={editedInstructions}
+                        onChange={(e) => setEditedInstructions(e.target.value)}
+                    />
+
+                    <div className="prof-modal-footer">
+                    <button
+                        className="prof-button prof-save-button"
+                        onClick={() => {
+                        setCourseInstructions(prev => ({
+                            ...prev,
+                            [selectedCourse]: editedInstructions
+                        }));
+                        alert(`Instructions updated for ${selectedCourse}`);
+                        closeModal();
+                        }}
+                    >
+                        Save Settings
+                    </button>
+
+                    <button
+                        className="prof-button prof-cancel-button"
+                        onClick={closeModal}
+                    >
+                        Cancel
+                    </button>
+                    </div>
                 </Modal>
             )}
         </div>
