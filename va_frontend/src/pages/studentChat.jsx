@@ -299,6 +299,7 @@ function StudentChat() {
                         placeholder="Enter Question"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
             </div>
