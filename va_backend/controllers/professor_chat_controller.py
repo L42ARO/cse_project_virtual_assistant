@@ -26,11 +26,11 @@ load_dotenv()
 api_key = os.getenv("AZURE_OPENAI_API_KEY_1")
 
 if not api_key:
-    raise ValueError("❌ API key not found! Check your .env file.")
+    raise ValueError("API key not found! Check your .env file.")
 
 endpoint = os.getenv("AZURE_OPENAI_API_ENDPOINT")
 if not endpoint:
-    raise ValueError("❌ ENDPOINT not found! Check your .env file.")
+    raise ValueError("ENDPOINT not found! Check your .env file.")
 
 client = AzureOpenAI(
     azure_endpoint=endpoint,
@@ -78,7 +78,7 @@ def get_question_insights():
     except BadRequest:
          return http_response("Invalid request data format (must be JSON)", 400)
     except Exception as e:
-        print(f"❌ Error fetching question insights for {course_id}: {e}")
+        print(f"Error fetching question insights for {course_id}: {e}")
         # import traceback
         # traceback.print_exc()
         return http_response("Internal server error", 500, error=str(e))
