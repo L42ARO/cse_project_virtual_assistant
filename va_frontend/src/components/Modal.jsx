@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "./Modal.css";
 
-const Modal = ({ isOpen, onClose, title, children, renderFooter }) => {
+const Modal = ({ isOpen, onClose, title, children }) => {
     const [closing, setClosing] = useState(false);
 
     useEffect(() => {
         if (!isOpen) {
-            setClosing(false); 
+            setClosing(false);
         }
     }, [isOpen]);
 
     if (!isOpen && !closing) return null;
 
     const handleClose = () => {
-        setClosing(true);   
-        setTimeout(() => {  
-            onClose();      
-            setClosing(false); 
-        }, 250);            
-    };    
+        setClosing(true);
+        setTimeout(() => {
+            onClose();
+            setClosing(false);
+        }, 250);
+    };
 
     return (
         <div className={`modal-overlay ${closing ? "modal-fadeout" : ""}`}>

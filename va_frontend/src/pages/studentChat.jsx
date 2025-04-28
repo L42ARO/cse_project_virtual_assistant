@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useServer } from "../context/serverContext";
 import { useAPI } from "../context/apiService";
 import "./studentChat.css";
@@ -7,6 +7,7 @@ import ChatBubble from "../components/ChatBubble";
 import ChatHistory from "../components/ChatHistory";
 import FlaggedQuestionList from "../components/FlaggedQuestionList";
 import NewChatButton from "../components/NewChatButton";
+import Modal from "../components/Modal";
 
 function StudentChat() {
     const { socket } = useServer();
@@ -21,6 +22,8 @@ function StudentChat() {
 
     const [chatHistory, setChatHistory] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");  // State for search query
+    const [isSearchModalOpen, setSearchModalOpen] = useState(false); // State for Modal visibility
     const chatBoxRef = useRef(null);
     const [lastStandbyTimestamp, setLastStandbyTimestamp] = useState(null);
     const [lastAIMessageTimestamp, setLastAIMessageTimestamp] = useState(null);
@@ -45,6 +48,18 @@ function StudentChat() {
         (q) => q.course === selectedCourse
     );
 
+    // Modal related functions
+    const openSearchModal = () => setSearchModalOpen(true);
+    const closeSearchModal = () => setSearchModalOpen(false);
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    // Filter the chat history based on search query
+    const filteredChatHistory = chatHistory.filter((chat) =>
+        chat.course.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     useEffect(() => {
         const loadChatHistory = async () => {
@@ -70,7 +85,6 @@ function StudentChat() {
 
         loadChatHistory();
     }, [selectedCourse]);
-
 
     const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
@@ -173,7 +187,6 @@ function StudentChat() {
         const token = localStorage.getItem("token");
 
         if (selectedChat && selectedChat.id === chat.id) {
-            // Deselecting current chat
             setSelectedChat(null);
             setChatMessages([]);
             setSessionId(null);
@@ -198,7 +211,6 @@ function StudentChat() {
         }
     };
 
-
     const handleNewChat = () => {
         if (selectedCourse === "Select a Course") {
             alert("Please select a course before starting a new chat.");
@@ -210,9 +222,6 @@ function StudentChat() {
         setSessionId(null);
         setHasSentInitialMessage(false);
         setChatInput("");
-        setLastStandbyTimestamp(null);
-        setLastAIMessageTimestamp(null);
-
         const newChatId = Date.now();
         const newChat = {
             id: newChatId,
@@ -236,10 +245,15 @@ function StudentChat() {
         <div className="student-chat-container">
             <div className="student-left-sidebar">
                 <div className="student-sidebar-content">
-                    <h2 className="student-sidebar-title">Chat History</h2>
+                <h2 className="student-sidebar-title">
+                    Chat History
+                    <button className="search-icon-button" onClick={openSearchModal}>
+                        🔍
+                    </button>
+                </h2>
                     <NewChatButton onNewChat={handleNewChat} />
                     <ChatHistory
-                        chatSessions={chatHistory
+                        chatSessions={filteredChatHistory
                             .filter(chat => chat.course === selectedCourse)
                             .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))}
                         onSelectChat={handleSelectChat}
@@ -256,10 +270,9 @@ function StudentChat() {
                     </h1>
                     <CourseDropdown
                         courses={studentCourses}
-                        value={selectedCourse} // pass current selected course down
+                        value={selectedCourse}
                         onSelectCourse={setSelectedCourse}
                     />
-
                 </div>
 
                 <div className="student-chat-box" ref={chatBoxRef}>
@@ -277,7 +290,6 @@ function StudentChat() {
                             message="..."
                         />
                     )}
-
                 </div>
 
                 <div className="student-input-container">
@@ -296,6 +308,23 @@ function StudentChat() {
                 <h2 className="student-sidebar-title">Flagged Questions</h2>
                 <FlaggedQuestionList flaggedQuestions={filteredFlaggedQuestions} />
             </div>
+
+            {/* Modal for search */}
+            <Modal
+                isOpen={isSearchModalOpen}
+                onClose={closeSearchModal}
+                title="Search Chats"
+            >
+                <div className="search-modal-body">
+                    <input
+                        type="text"
+                        className="modal-search-input"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Search..."
+                    />
+                </div>
+            </Modal>
         </div>
     );
 }

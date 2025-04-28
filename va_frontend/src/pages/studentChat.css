@@ -1,25 +1,78 @@
-/* Main container */
+/* Main container for the chat */
 .student-chat-container {
   display: flex;
   height: 100vh;
   width: 100%;
-  background-color: #EFEFEF; /* Light gray background */
+  background-color: #EFEFEF;  /* Light gray background */
+  position: relative;  /* For aligning the modal correctly */
 }
 
 /* Sidebar (Chat History) */
-.student-sidebar {
-  width: 20%;
-  background-color: #E6E8E6; /* Sidebar gray */
+.student-left-sidebar {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  height: 100vh;
+  width: 25%;  /* Decreased width for the left sidebar */
+  background-color: #E6E8E6;
   padding: 20px;
+  box-sizing: border-box;
+  position: relative;  /* For positioning the search icon */
 }
 
+/* Sidebar Content */
+.student-sidebar-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  justify-content: flex-start;  /* Align content to the top */
+}
+
+/* Chat History Title */
 .student-sidebar-title {
+  display: flex;           /* Use flex to align items horizontally */
+  align-items: center;     /* Vertically center the title and search icon */
   font-size: 18px;
   font-weight: bold;
   color: #000;
+  margin-bottom: 10px;     /* Space below the title */
+  justify-content: space-between; /* Ensures space between title and search icon */
+  width: 100%; /* Ensure the title takes full width */
+}
+
+/* Search Icon Button */
+.search-icon-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;  /* Adjust icon size */
+  margin-left: 8px;  /* Space between title and icon */
+  margin-top: -2px;  /* Slightly raise the icon by adjusting the top margin */
+}
+
+/* Right Sidebar (Flagged Questions) */
+.student-right-sidebar {
+  width: 20%;  /* Decreased width for the right sidebar */
+  background-color: #E6E8E6;
+  padding: 20px;
+  max-height: 100vh;
+  overflow-y: auto;  /* Enables vertical scrolling */
+  box-sizing: border-box;
+}
+
+/* Chat History and New Chat Button */
+.student-left-sidebar .student-sidebar-content .new-chat-button {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #475841;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 15px;  /* Ensure there's some space between items */
 }
 
 .student-logout-button {
@@ -53,7 +106,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 0px 20px;
   background-color: #FFFFFF;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -70,11 +123,11 @@
   color: #3F403F;
 }
 
-/* Input Box (Updated to Match Professor Dashboard) */
+/* Input Box */
 .student-input-container {
   display: flex;
   align-items: center;
-  width: 90%;
+  width: 94%;
   margin-top: 10px;
 }
 
@@ -86,32 +139,6 @@
   font-size: 16px;
 }
 
-.student-left-sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100vh; /* Ensure full height */
-  width: 20%;
-  background-color: #E6E8E6;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-/* Right Sidebar (Flagged Questions) */
-.student-right-sidebar {
-  width: 20%;
-  background-color: #E6E8E6;
-  padding: 20px;
-}
-
-.student-sidebar-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-}
-
 /* Chat Box */
 .student-chat-box {
   width: 90%;
@@ -120,9 +147,70 @@
   border-radius: 10px;
   border: 1px solid #475841;
   margin-top: 20px;
-  position: relative; 
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 10px;
   overflow-y: auto;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f4f4f4;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Modal Search Input */
+.modal-search-input {
+  padding: 8px;
+  font-size: 16px;
+  width: 100%;
+  border: 1px solid #475841;
+  border-radius: 5px;
+  margin-top: 20px;
 }
