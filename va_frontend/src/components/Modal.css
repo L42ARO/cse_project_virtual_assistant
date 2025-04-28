@@ -89,3 +89,32 @@
     opacity: 1;
   }
 }
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+}
+
+/* When closing */
+.modal-fadeout {
+  animation: fadeOut 0.25s ease-out forwards;
+}
+
+.modal-slideout {
+  animation: slideOut 0.25s ease-out forwards;
+}

@@ -232,3 +232,36 @@
   border-color: #475841;
   outline: none;
 }
+
+/* Graph container: fixed height, flex bottom-aligned */
+.insight-graph-container {
+  display: flex;
+  justify-content: center;  
+  align-items: flex-end;     
+  height: 260px;             
+  gap: 20px;                 
+  margin-top: 20px;
+}
+
+/* Each bar+label wrapper */
+.insight-item {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The bar itself */
+.insight-bar {
+  width: 48px;
+  border-radius: 4px 4px 0 0;
+  background-color: #475841;
+}
+
+/* Label underneath */
+.insight-label {
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+  overflow-wrap: break-word;
+}
