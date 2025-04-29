@@ -24,11 +24,11 @@ load_dotenv()
 api_key = os.getenv("AZURE_OPENAI_API_KEY_1")
 
 if not api_key:
-    raise ValueError("❌ API key not found! Check your .env file.")
+    raise ValueError("API key not found! Check your .env file.")
 
 endpoint = os.getenv("AZURE_OPENAI_API_ENDPOINT")
 if not endpoint:
-    raise ValueError("❌ ENDPOINT not found! Check your .env file.")
+    raise ValueError("ENDPOINT not found! Check your .env file.")
 
 client = AzureOpenAI(
     azure_endpoint=endpoint,
@@ -46,6 +46,39 @@ openai_course_assistants ={
 
 openAiService = OpenAIService(user_role="professor")
 sessions = {}
+
+@bp.route(f"{prefix}/question-insights", methods=["POST"])
+def get_question_insights():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+        course_id = data.get("course_id")
+
+        # Validate token and role (ensure it's a professor)
+        username = decode_token(token)
+        # Add role check here if needed, using your existing isProfessor logic
+        # from users_controller or similar mechanism
+        if not username: # or not isProfessor(username): # Add role check if needed
+            return http_response("Unauthorized", 401, error="Invalid token or insufficient permissions.")
+
+        if not course_id:
+            return http_response("Missing course_id", 400)
+
+        # Fetch insights using the new service
+        insights = questionReader.get_weekly_insights(course_id)
+
+        return http_response(
+            message="Weekly question insights retrieved successfully",
+            status=200,
+            data=insights # Return the insights data
+        )
+    except BadRequest:
+         return http_response("Invalid request data format (must be JSON)", 400)
+    except Exception as e:
+        print(f"❌ Error fetching question insights for {course_id}: {e}")
+        # import traceback
+        # traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
 
 @bp.route(f'{prefix}/chat-intro', methods=["POST"])
 def chat_intro():

@@ -24,7 +24,7 @@ function ProfessorDashboard() {
     const fileInputRef = useRef(null);
     const chatBoxRef = useRef(null);
 
-    // Dummy flagged data (replace this with real API call later)
+    // Dummy flagged data 
     const dummyFlaggedData = {
         mandatory: [
             {
@@ -105,10 +105,61 @@ function ProfessorDashboard() {
         CDA4213: "You are a virtual TA for computer architecture. Focus on clarity and technical depth."
       };
       
-      const [courseInstructions, setCourseInstructions] = useState(dummyCourseInstructions);
-      const [editedInstructions, setEditedInstructions] = useState(""); // stores textarea input
-      
+    const [courseInstructions, setCourseInstructions] = useState(dummyCourseInstructions);
+    const [editedInstructions, setEditedInstructions] = useState(""); // stores textarea input
 
+    const dummyInsightData = [
+        {
+            id: "CAP6317", 
+            theme_summary: "Week 6 Content Inquiry",
+            count: 1,
+            examples: [
+            "What are we covering on week 6?"
+            ]
+        },
+        {
+            id: "CAP6317",
+            theme_summary: "Professor Contact Information",
+            count: 2,
+            examples: [
+            "How can I contact the professor?",
+            "What's the prof's contact info?"
+            ]
+        },
+        {
+            id: "CAP6317",
+            theme_summary: "Assignment 1 Preparation",
+            count: 1,
+            examples: [
+            "What should I read before doing assignment 1?"
+            ]
+        },
+        {
+            id: "CDA4213",
+            theme_summary: "Memory Hierarchy",
+            count: 3,
+            examples: [
+            "What is cache memory?",
+            "L1 vs L2 cache?",
+            "Explain virtual memory."
+            ]
+        },
+        {
+            id: "CDA4213",
+            theme_summary: "Pipeline Stages",
+            count: 2,
+            examples: [
+            "How many stages are in MIPS pipeline?",
+            "Explain branch prediction."
+            ]
+        }
+    ];
+    
+    const [insightData, setInsightData] = useState(dummyInsightData);
+    const [insightView, setInsightView] = useState("list");
+    const [selectedThemeExamples, setSelectedThemeExamples] = useState(null);
+
+      
     const shouldShowStandby = lastStandbyTimestamp &&
         (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
 
@@ -282,6 +333,14 @@ function ProfessorDashboard() {
     }, [selectedCourse]);
 
     useEffect(() => {
+        if (selectedCourse) {
+            const filteredInsights = dummyInsightData.filter(item => item.id === selectedCourse);
+            setInsightData(filteredInsights);
+        }
+    }, [selectedCourse]);
+    
+
+    useEffect(() => {
         if (modalType === "AI Settings" && selectedCourse) {
           setEditedInstructions(courseInstructions[selectedCourse] || "");
         }
@@ -315,6 +374,7 @@ function ProfessorDashboard() {
                     <button className="prof-nav-item" onClick={() => openModal("Student Activity")}>👥 Student Activity</button>
                     <button className="prof-nav-item" onClick={() => openModal("Course Material")}>📝 Course Material</button>
                     <button className="prof-nav-item" onClick={() => openModal("AI Settings")}>⚙️ AI Settings</button>
+                    <button className="prof-nav-item" onClick={() => openModal("Notifications")}>🔔 Notifications</button>
                 </nav>
                 <button onClick={handleLogout} className="prof-logout-button">← Log out</button>
             </div>
@@ -379,131 +439,66 @@ function ProfessorDashboard() {
             {/* Student Activity Modal */}
             {modalType === "Student Activity" && (
                 <Modal title="Student Activity" isOpen={!!modalType} onClose={closeModal}>
-
-                    {/* Toggle to show/hide seen flags */}
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                            <input
-                            type="checkbox"
-                            checked={showSeen}
-                            onChange={() => setShowSeen(prev => !prev)} // toggle the showSeen state
-                            style={{ marginRight: "5px" }}
-                            />
-                            Show Seen Flags
-                        </label>
+                    {/* Button to toggle between list and Graph view */}
+                    <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center" }}>
+                        <button
+                            className="prof-button prof-save-button"
+                            onClick={() => setInsightView(prev => prev === "list" ? "graph" : "list")}
+                        >
+                            Switch to {insightView === "list" ? "Graph" : "List"} View
+                        </button>
                     </div>
 
-                    {/* Mandatory flags section */}
-                    <h3>Mandatory Flags</h3>
-                    {flaggedData.mandatory
-                    // Only show flags from the selected course
-                    // If showSeen is true → show only seen flags; otherwise show only unseen
-                    .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
-                    .map((flag) => (
-                        <div key={flag.id} className="flag-box">
-                        <p><strong>Q:</strong> {flag.question}</p>
-                        <p><em>Reason:</em> {flag.reason}</p>
+                    {insightView === "list" ? (
+                        <>
+                            {/* List View */}
+                            {insightData.map((item, index) => (
+                            <div key={index} style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>
+                                <p><strong>Theme:</strong> {item.theme_summary}</p>
+                                <p><strong>Count:</strong> {item.count}</p>
+                                <button
+                                    className="prof-button prof-reply-button"
+                                    onClick={() => setSelectedThemeExamples(item)}
+                                >
+                                    See Questions
+                                </button>
+                          </div>
+                            ))}
+                        </>
+                        ) : (
+                        <>
+                            {/* Graph View */}
+                            <div className="insight-graph-container">
+                                {insightData.map((item, idx) => (
+                                    <div key={idx} className="insight-item">
+                                        <div
+                                            className="insight-bar"
+                                            style={{ height: `${item.count * 40}px` }}
+                                            title={`${item.theme_summary}: ${item.count}`}
+                                        />
+                                        <div className="insight-label">
+                                            {item.theme_summary}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
 
-                        {/* Checkbox to toggle seen status for this mandatory flag */}
-                        <label>
-                            <input
-                            type="checkbox"
-                            checked={flag.seen}
-                            onChange={() => {
-                                // Create a new updated mandatory list with toggled seen for this flag
-                                const updated = {
-                                ...flaggedData,
-                                mandatory: flaggedData.mandatory.map(f =>
-                                    f.id === flag.id ? { ...f, seen: !f.seen } : f
-                                )
-                                };
-                                setFlaggedData(updated); // Update state with new list
-                            }}
-                            />
-                            Mark as Seen
-                        </label>
-                        <hr />
-                        </div>
-                    ))}
-
-                    {/* Voluntary flags section */}
-                    <h3>Voluntary Flags</h3>
-                    {flaggedData.voluntary
-                    // Show only voluntary flags from the selected course
-                    // Show all if showSeen is true; else show only unseen ones
-                    .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
-                    .map((flag) => (
-                        <div key={flag.id} className="flag-box">
-                        <p><strong>Q:</strong> {flag.question}</p>
-                        <p><em>Reason:</em> {flag.reason}</p>
-
-                        {/* Checkbox to manually toggle seen status for this voluntary flag */}
-                        <label>
-                            <input
-                            type="checkbox"
-                            checked={flag.seen}
-                            onChange={() => {
-                                const updated = {
-                                ...flaggedData,
-                                voluntary: flaggedData.voluntary.map(f =>
-                                    f.id === flag.id ? { ...f, seen: !f.seen } : f
-                                )
-                                };
-                                setFlaggedData(updated); // Save updated state
-                            }}
-                            />
-                            Mark as Seen
-                        </label>
-
-                        {/* Reply box to allow the professor to respond to this flagged question */}
-                        <textarea
-                            rows={3}
-                            style={{ width: '100%', marginTop: '10px' }}
-                            placeholder="Write your reply here..."
-                            value={flag.reply || ""} // controlled input
-                            onChange={(e) => {
-                            // Update the specific flag with new reply text
-                            const updated = {
-                                ...flaggedData,
-                                voluntary: flaggedData.voluntary.map(f =>
-                                f.id === flag.id ? { ...f, reply: e.target.value } : f
-                                )
-                            };
-                            setFlaggedData(updated);
-                            }}
-                        />
-
-                        {/* Send button to simulate a reply being sent */}
-                        <button
-                            className="prof-button prof-reply-button"
-                            onClick={() => {
-                            // Show an alert with the reply content
-                            alert(`Reply sent: ${flag.reply || "[empty]"}`);
-
-                            // Mark this specific flag as seen after the reply is "sent"
-                            const updatedVoluntaryFlags = flaggedData.voluntary.map((f) => {
-                                if (f.id === flag.id) {
-                                return {
-                                    ...f,
-                                    reply: flag.reply || "", // keep reply content
-                                    seen: true               // auto-mark as seen after replying
-                                };
-                                }
-                                return f; // don't change other flags
-                            });
-
-                            // Apply updated voluntary flags to global state
-                            setFlaggedData({
-                                ...flaggedData,
-                                voluntary: updatedVoluntaryFlags
-                            });
-                            }}
+                    {/* See Questions Modal */}
+                    {selectedThemeExamples && (
+                        <Modal
+                            title={`Questions for "${selectedThemeExamples.theme_summary}"`}
+                            isOpen={true}
+                            onClose={() => setSelectedThemeExamples(null)}
                         >
-                            Send Reply
-                        </button>
-                        <hr />
-                        </div>
-                    ))}
+                            <ul style={{ paddingLeft: "30px" }}>
+                                {selectedThemeExamples.examples.map((ex, idx) => (
+                                    <li key={idx}>{ex}</li>
+                                ))}
+                            </ul>
+                        </Modal>
+                    )}
                 </Modal>
             )}
             {modalType === "Course Material" && (
@@ -603,6 +598,136 @@ function ProfessorDashboard() {
                     </button>
                     </div>
                 </Modal>
+            )}
+
+            {modalType === "Notifications" && (
+                <Modal title="Notifications" isOpen={!!modalType} onClose={closeModal}>
+
+                {/* Toggle to show/hide seen flags */}
+                <div style={{ marginBottom: "10px" }}>
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={showSeen}
+                        onChange={() => setShowSeen(prev => !prev)} // toggle the showSeen state
+                        style={{ marginRight: "5px" }}
+                        />
+                        Show Seen Flags
+                    </label>
+                </div>
+
+                {/* Mandatory flags section */}
+                <h3>Mandatory Flags</h3>
+                {flaggedData.mandatory
+                // Only show flags from the selected course
+                // If showSeen is true → show only seen flags; otherwise show only unseen
+                .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
+                .map((flag) => (
+                    <div key={flag.id} className="flag-box">
+                    <p><strong>Q:</strong> {flag.question}</p>
+                    <p><em>Reason:</em> {flag.reason}</p>
+
+                    {/* Checkbox to toggle seen status for this mandatory flag */}
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={flag.seen}
+                        onChange={() => {
+                            // Create a new updated mandatory list with toggled seen for this flag
+                            const updated = {
+                            ...flaggedData,
+                            mandatory: flaggedData.mandatory.map(f =>
+                                f.id === flag.id ? { ...f, seen: !f.seen } : f
+                            )
+                            };
+                            setFlaggedData(updated); // Update state with new list
+                        }}
+                        />
+                        Mark as Seen
+                    </label>
+                    <hr />
+                    </div>
+                ))}
+
+                {/* Voluntary flags section */}
+                <h3>Voluntary Flags</h3>
+                {flaggedData.voluntary
+                // Show only voluntary flags from the selected course
+                // Show all if showSeen is true; else show only unseen ones
+                .filter(f => f.course_id === selectedCourse && (showSeen ? f.seen : !f.seen))
+                .map((flag) => (
+                    <div key={flag.id} className="flag-box">
+                    <p><strong>Q:</strong> {flag.question}</p>
+                    <p><em>Reason:</em> {flag.reason}</p>
+
+                    {/* Checkbox to manually toggle seen status for this voluntary flag */}
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={flag.seen}
+                        onChange={() => {
+                            const updated = {
+                            ...flaggedData,
+                            voluntary: flaggedData.voluntary.map(f =>
+                                f.id === flag.id ? { ...f, seen: !f.seen } : f
+                            )
+                            };
+                            setFlaggedData(updated); // Save updated state
+                        }}
+                        />
+                        Mark as Seen
+                    </label>
+
+                    {/* Reply box to allow the professor to respond to this flagged question */}
+                    <textarea
+                        rows={3}
+                        style={{ width: '100%', marginTop: '10px' }}
+                        placeholder="Write your reply here..."
+                        value={flag.reply || ""} // controlled input
+                        onChange={(e) => {
+                        // Update the specific flag with new reply text
+                        const updated = {
+                            ...flaggedData,
+                            voluntary: flaggedData.voluntary.map(f =>
+                            f.id === flag.id ? { ...f, reply: e.target.value } : f
+                            )
+                        };
+                        setFlaggedData(updated);
+                        }}
+                    />
+
+                    {/* Send button to simulate a reply being sent */}
+                    <button
+                        className="prof-button prof-reply-button"
+                        onClick={() => {
+                        // Show an alert with the reply content
+                        alert(`Reply sent: ${flag.reply || "[empty]"}`);
+
+                        // Mark this specific flag as seen after the reply is "sent"
+                        const updatedVoluntaryFlags = flaggedData.voluntary.map((f) => {
+                            if (f.id === flag.id) {
+                            return {
+                                ...f,
+                                reply: flag.reply || "", // keep reply content
+                                seen: true               // auto-mark as seen after replying
+                            };
+                            }
+                            return f; // don't change other flags
+                        });
+
+                        // Apply updated voluntary flags to global state
+                        setFlaggedData({
+                            ...flaggedData,
+                            voluntary: updatedVoluntaryFlags
+                        });
+                        }}
+                    >
+                        Send Reply
+                    </button>
+                    <hr />
+                    </div>
+                ))}
+            </Modal>
             )}
         </div>
     );
