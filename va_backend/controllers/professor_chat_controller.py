@@ -1,7 +1,7 @@
 import traceback
 import uuid
 import os
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from flask_socketio import SocketIO
 from pydantic import ValidationError
 from models.pcc_course_new_req import *
@@ -13,6 +13,8 @@ from werkzeug.exceptions import BadRequest
 from utils.utils import *
 from dotenv import load_dotenv
 from services.openai_service import *
+from services.question_logging_service import QuestionLoggingService
+from services.flagging_service import FlaggingService
 
 
 # Create a Blueprint
@@ -45,27 +47,44 @@ openai_course_assistants ={
 }
 
 openAiService = OpenAIService(user_role="professor")
+questionReader = QuestionLoggingService() # Instantiate for reading insights
+flag_svc = FlaggingService()
 sessions = {}
+
+@bp.route(f"{prefix}/flagged-notifications", methods=["POST"])
+def get_notifications():
+    try:
+        data = request.get_json(force=True)
+        course_id = data.get("course_id")
+        if not course_id:
+            return http_response("Missing course_id", 400, error="course_id is required")
+
+        # Read both mandatory and voluntary (excluding already seen)
+        mandatory = flag_svc.read_flagged_questions(course_id, flag_type="mandatory", include_seen=False)
+        voluntary = flag_svc.read_flagged_questions(course_id, flag_type="voluntary", include_seen=False)
+
+        return jsonify({
+            "ok": True,
+            "data": {"mandatory": mandatory, "voluntary": voluntary}
+        }), 200
+    except Exception as e:
+        print(f"Error fetching notifications for {course_id}: {e}")
+        # import traceback
+        # traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
 
 @bp.route(f"{prefix}/question-insights", methods=["POST"])
 def get_question_insights():
     try:
         data = request.get_json()
-        token = data.get("token")
         course_id = data.get("course_id")
-
-        # Validate token and role (ensure it's a professor)
-        username = decode_token(token)
-        # Add role check here if needed, using your existing isProfessor logic
-        # from users_controller or similar mechanism
-        if not username: # or not isProfessor(username): # Add role check if needed
-            return http_response("Unauthorized", 401, error="Invalid token or insufficient permissions.")
 
         if not course_id:
             return http_response("Missing course_id", 400)
 
         # Fetch insights using the new service
         insights = questionReader.get_weekly_insights(course_id)
+        print(insights)
 
         return http_response(
             message="Weekly question insights retrieved successfully",
@@ -94,7 +113,7 @@ def chat_intro():
         if openai_course_assistants.get(course_id) is None:
             raise BadRequest
 
-        
+
         assistant_id=openai_course_assistants[course_id][0]
         instructions = openAiService.get_assistant_instructions(assistant_id)
 
@@ -126,7 +145,7 @@ def chat_intro():
             message="Internal server error",
             status=500,
             error=str(e)
-        )   
+        )
 
 @bp.route(f'{prefix}/chat-start', methods=["POST"])
 def chat_start():
@@ -153,7 +172,7 @@ def chat_start():
                 status=503,
                 error="No username, token probably expired"
             )
-        
+
         if openai_course_assistants.get(course_id) is None:
             raise BadRequest
 
@@ -222,9 +241,9 @@ def chat_start():
             message="Internal server error",
             status=500,
             error=str(e)
-        )   
-        
-        
+        )
+
+
 @bp.route(f"{prefix}/new-course", methods=["POST"])
 def new_course():
     """Creates a new course and sends initial WebSocket messages."""
@@ -307,6 +326,154 @@ def upload_file():
         return http_response("File uploaded successfully", 200, data={"file_id": file_id})
     except Exception as e:
         import traceback
+        traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
+
+@bp.route(f"{prefix}/course-materials", methods=["GET"])
+def get_course_materials():
+    """Fetch all uploaded course materials for a given course."""
+    try:
+        # Read only from query string
+        course_id = request.args.get("course_id")
+
+        if not course_id:
+            return http_response("Missing course_id", 400)
+
+
+        if course_id not in openai_course_assistants:
+            return http_response("Unknown course_id", 400, error="Course not found")
+
+        vs_id = openai_course_assistants[course_id][1]
+
+        # Use the official client and grab the 'data' list
+        vec_files  = openAiService.client.vector_stores.files.list(vector_store_id=vs_id) # this is the list of file-objects
+        materials = []
+        # 2) for each, retrieve the actual file metadata to get its filename
+        for item in vec_files:
+            file_meta = openAiService.client.files.retrieve(file_id=item.id)
+            materials.append({
+                "fileId": item.id,
+                "fileName": file_meta.filename
+            })
+
+        return http_response(
+            message="Course materials retrieved successfully",
+            status=200,
+            data=materials
+        )
+
+    except Exception as e:
+        traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
+
+
+@bp.route(f"{prefix}/course-materials", methods=["DELETE"])
+def delete_course_material():
+    """Delete a specific file from the course’s vector store."""
+    try:
+        course_id = request.args.get("course_id")
+        file_id   = request.args.get("file_id")
+        if not course_id or not file_id:
+            return http_response("Missing course_id, file_id or token", 400)
+
+        if course_id not in openai_course_assistants:
+            return http_response("Unknown course_id", 400, error="Course not found")
+
+        vs_id = openai_course_assistants[course_id][1]
+        print(vs_id)
+
+        # Delete the file association from the vector store
+        deleted_vs_file = openAiService.client.vector_stores.files.delete(
+            vector_store_id=vs_id,
+            file_id=file_id
+        )
+        if deleted_vs_file.deleted:
+            print(f"Successfully removed file {file_id} from vector store {vs_id}.")
+            # Optionally, delete the file object itself from OpenAI to free up storage
+            # Be cautious with this if the file might be used elsewhere.
+            deleted_file = openAiService.client.files.delete(file_id=file_id)
+            if deleted_file.deleted:
+                print(f"Successfully deleted file object {file_id} from OpenAI.")
+            else:
+                print(
+                    f"Warning: Failed to delete file object {file_id} from OpenAI after removing from vector store.")
+
+        return http_response(
+            message="File deleted successfully",
+            status=200
+        )
+    except Exception as e:
+        return http_response("Internal server error", 500, error=str(e))
+
+
+@bp.route(f"{prefix}/ai-settings", methods=["GET"])
+def get_ai_settings():
+    """Fetch the base AI instructions for a given course’s assistant."""
+    try:
+        # 1) Read course_id directly from the query string
+        course_id = request.args.get("course_id")
+        if not course_id:
+            return http_response("Missing course_id", 400)
+
+        # 2) Validate you have an assistant for that course
+        if course_id not in openai_course_assistants:
+            return http_response("Unknown course_id", 400, error="Course not found")
+
+        # 3) Retrieve via the standard client.assistants API
+        assistant_id = openai_course_assistants[course_id][0]
+        assistant = openAiService.client.beta.assistants.retrieve(assistant_id)
+        instructions = assistant.instructions
+
+        # 4) Return JSON via your helper
+        return http_response(
+            "AI settings retrieved successfully",
+            200,
+            data={"instructions": instructions}
+        )
+    except Exception as e:
+        # print full traceback to your console so you can see the real error
+        import traceback; traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
+
+
+from flask import request, jsonify
+from werkzeug.exceptions import BadRequest
+from pydantic import ValidationError
+
+@bp.route(f"{prefix}/ai-settings", methods=["PUT"])
+def update_ai_settings():
+    """Update the base AI instructions for a given course’s assistant."""
+    try:
+        payload = request.get_json(force=True)
+        course_id   = payload.get("course_id")
+        instructions = payload.get("instructions")
+
+        if not course_id or instructions is None:
+            # missing one of the required fields
+            return http_response("Invalid request data", 400, error="Both 'course_id' and 'instructions' are required")
+
+        if course_id not in openai_course_assistants:
+            return http_response("Unknown course_id", 400, error="Course not found")
+
+        assistant_id = openai_course_assistants[course_id][0]
+
+        openAiService.client.beta.assistants.update(
+            assistant_id=assistant_id,
+            instructions=instructions
+        )
+        print(f"Successfully updated instructions for assistant {assistant_id}")
+
+        return http_response(
+            "AI settings updated successfully",
+            200,
+            data=True
+        )
+
+    except BadRequest:
+        # malformed JSON
+        return http_response("Invalid request data", 400, error="Malformed JSON")
+
+    except Exception as e:
         traceback.print_exc()
         return http_response("Internal server error", 500, error=str(e))
 

@@ -22,5 +22,13 @@
     "reason": "The assistant cannot provide specific answers about the syllabus content and its relevance.",
     "timestamp": "2025-03-27T13:09:48.966197",
     "seen": false
+  },
+  {
+    "id": "c4599131-5b72-4f0b-a10e-30f6c54d2fb1",
+    "course_id": "CAP6317",
+    "question": "I was wondering if we could get some extra credit for participation in class.",
+    "reason": "The assistant cannot answer questions related to course policies or grading.",
+    "timestamp": "2025-04-30T09:50:07.027328",
+    "seen": false
   }
 ]
