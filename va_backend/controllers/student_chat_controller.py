@@ -7,10 +7,8 @@ from models.scc_chat_cont_req import *
 import uuid
 from datetime import datetime, timezone
 from utils.utils import *
-from services.openai_service import OpenAIService
+from services.openai_service import OpenAIService  # Import the OpenAI service
 from services.session_logging_service import *
-from services.question_logging_service import QuestionLoggingService
-
 
 # Create a Blueprint
 socketio = None
@@ -24,7 +22,6 @@ openai_course_assistants ={
 
 openAiService = OpenAIService()
 sessionsService = SessionLoggingService()
-questionLogger = QuestionLoggingService()
 
 stored_sessions = sessionsService.get_sessions()
 sessions = {
@@ -130,17 +127,7 @@ def chat_start():
                 error="No username, token probably expired"
             )
 
-
-        # --- Log the initial student question ---
-        try:
-            questionLogger.log_question(
-                course_id=course_id,
-                session_id=session_id,
-                question_text=message
-            )
-        except Exception as log_e:
-            print(f"⚠️ Failed to log question: {log_e}")
-
+        
         if openai_course_assistants.get(course_id) is None:
             raise BadRequest
 
@@ -266,21 +253,6 @@ def register_socketio_events(_socketio: SocketIO):
             assistant_id = openai_course_assistants[course_id][0]
             if assistant_id is None:
                 raise ValueError("Assistant not available for this course.")
-
-            # Log question
-            try:
-                # Make sure username and course_id were retrieved successfully
-                if course_id and session_id:
-                     questionLogger.log_question(
-                         course_id=course_id,
-                         session_id=session_id,
-                         question_text=message
-                     )
-                else:
-                     print("⚠️ Skipping question log due to missing data (user/course/session).")
-            except Exception as log_e:
-                print(f"⚠️ Failed to log question: {log_e}")
-
             socketio.emit("ws_scc_ai_stdby", {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             })

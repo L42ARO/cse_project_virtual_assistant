@@ -94,7 +94,7 @@ def get_question_insights():
     except BadRequest:
          return http_response("Invalid request data format (must be JSON)", 400)
     except Exception as e:
-        print(f"Error fetching question insights for {course_id}: {e}")
+        print(f"❌ Error fetching question insights for {course_id}: {e}")
         # import traceback
         # traceback.print_exc()
         return http_response("Internal server error", 500, error=str(e))
