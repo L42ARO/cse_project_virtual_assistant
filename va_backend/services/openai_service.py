@@ -1,4 +1,4 @@
-from openai import OpenAI, AzureOpenAI
+from openai import OpenAI, AzureOpenAI, RateLimitError, APIError, NotFoundError
 import json
 import os
 import time
@@ -10,14 +10,15 @@ fs = FlaggingService()
 
 load_dotenv()
 
+
 class OpenAIService:
     def __init__(
-        self,
-        api_key_env="OPENAI_API_KEY",
-        endpoint=None,
-        deployment_id=None,
-        api_version="gpt-4o-mini",
-        user_role="student"  # Default to student
+            self,
+            api_key_env="OPENAI_API_KEY",
+            endpoint=None,
+            deployment_id=None,
+            api_version="gpt-4o-mini",
+            user_role="student"  # Default to student
     ):
         self.user_role = user_role
         self.api_key = os.getenv(api_key_env)
@@ -67,18 +68,17 @@ class OpenAIService:
 
         return self.client.beta.assistants.update(assistant_id=assistant_id, **payload)
 
-
     # === Vector Store ===
 
     def create_vector_store(self, name="CourseStore"):
-        store = self.client.beta.vector_stores.create(name=name)
+        store = self.client.vector_stores.create(name=name)
         return store.id
 
     def add_file(self, file_obj):
         return self.client.files.create(file=file_obj, purpose="assistants")
 
     def add_file_to_vector_store(self, file_id, vector_store_id):
-        return self.client.beta.vector_stores.file_batches.create(
+        return self.client.vector_stores.file_batches.create(
             vector_store_id=vector_store_id,
             file_ids=[file_id]
         )
@@ -87,8 +87,7 @@ class OpenAIService:
         return self.client.files.delete(file_id)
 
     def list_files_in_vector_store(self, vector_store_id):
-        return self.client.beta.vector_stores.files.list(vector_store_id=vector_store_id)
-
+        return self.client.vector_stores.files.list(vector_store_id=vector_store_id)
 
     # === Threads & Messages ===
 
@@ -110,7 +109,6 @@ class OpenAIService:
 
         return self.client.beta.threads.messages.create(**message_payload)
 
-
     def run_thread(self, thread_id, assistant_id, stream=False, event_handler=None):
         if stream:
             return self.client.beta.threads.runs.stream(
@@ -125,7 +123,7 @@ class OpenAIService:
 
     def wait_for_run(self, thread_id, run_id, assistant_id=None, course_id=None, poll_interval=1):
         print(f"L42: Waiting for run {run_id} on thread {thread_id}")
-    
+
         while True:
             run = self.client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
             print(f"L42: Current run status: {run.status}")
@@ -213,7 +211,8 @@ class OpenAIService:
                             flag_type = args.get("flag_type", "all")
 
                             print("L42: 🧑‍🏫 Professor requested flagged questions")
-                            print(f"L42: Injected course_id={course_id}, include_seen={include_seen}, flag_type={flag_type}")
+                            print(
+                                f"L42: Injected course_id={course_id}, include_seen={include_seen}, flag_type={flag_type}")
 
                             if self.user_role != "professor":
                                 print("L42: ❌ Unauthorized flag query by non-professor")
@@ -226,10 +225,12 @@ class OpenAIService:
                             result = []
 
                             if flag_type in ["mandatory", "all"]:
-                                result.extend(fs.read_flagged_questions(course_id, flag_type="mandatory", include_seen=include_seen))
+                                result.extend(fs.read_flagged_questions(course_id, flag_type="mandatory",
+                                                                        include_seen=include_seen))
 
                             if flag_type in ["voluntary", "all"]:
-                                result.extend(fs.read_flagged_questions(course_id, flag_type="voluntary", include_seen=include_seen))
+                                result.extend(fs.read_flagged_questions(course_id, flag_type="voluntary",
+                                                                        include_seen=include_seen))
 
                             result.sort(key=lambda x: x["timestamp"], reverse=True)
 
@@ -242,7 +243,6 @@ class OpenAIService:
                                 "tool_call_id": call.id,
                                 "output": summary
                             })
-
 
                     if tool_outputs:
                         print("L42: Submitting tool outputs")
@@ -258,7 +258,6 @@ class OpenAIService:
                 raise RuntimeError(f"Run failed with status: {run.status}")
 
             time.sleep(poll_interval)
-
 
     def get_latest_response(self, thread_id, run_id=None, assistant_id=None):
         messages = self.client.beta.threads.messages.list(thread_id=thread_id)
@@ -281,8 +280,6 @@ class OpenAIService:
                 else:
                     return msg.content[0].text.value
         return None
-
-
 
     def get_assistant_instructions(self, assistant_id):
         assistant = self.client.beta.assistants.retrieve(assistant_id)
@@ -312,4 +309,105 @@ class OpenAIService:
         except Exception as e:
             print(f"L42: Failed to fetch messages for thread {thread_id}: {str(e)}")
             return []
- 
+
+    # --- NEW/MODIFIED Methods ---
+
+    def get_assistant_instructions(self, assistant_id: str) -> str | None:
+        """Retrieves the instructions for a given assistant."""
+        try:
+            assistant = self.client.beta.assistants.retrieve(assistant_id)
+            return assistant.instructions
+        except NotFoundError:
+            print(f"Error: Assistant {assistant_id} not found.")
+            return None
+        except APIError as e:
+            print(f"Error retrieving assistant {assistant_id}: {e}")
+            return None
+
+    def update_assistant_instructions(self, assistant_id: str, instructions: str) -> bool:
+        """Updates the instructions for a given assistant."""
+        try:
+            self.client.beta.assistants.update(
+                assistant_id=assistant_id,
+                instructions=instructions
+            )
+            print(f"Successfully updated instructions for assistant {assistant_id}")
+            return True
+        except NotFoundError:
+            print(f"Error: Assistant {assistant_id} not found during update.")
+            return False
+        except APIError as e:
+            print(f"Error updating assistant {assistant_id}: {e}")
+            return False
+
+    def list_vector_store_files(self, vector_store_id: str) -> list[dict] | None:
+        """Lists files in a vector store, returning their ID and filename."""
+        files_info = []
+        try:
+            # List files associated with the vector store
+            vector_store_files = self.client.beta.vector_stores.files.list(vector_store_id=vector_store_id)
+
+            # For each vector store file, retrieve the original file object to get the filename
+            for vs_file in vector_store_files.data:
+                try:
+                    # Retrieve the associated File object using the file_id
+                    file_object = self.client.files.retrieve(file_id=vs_file.id)
+                    files_info.append({
+                        "fileId": vs_file.id,  # This is the ID needed for deletion from vector store
+                        "fileName": file_object.filename  # Get the actual filename
+                    })
+                except NotFoundError:
+                    print(f"Warning: File object for vector store file {vs_file.id} not found. Skipping.")
+                except APIError as e:
+                    print(f"Warning: API error retrieving file object {vs_file.id}: {e}. Skipping.")
+
+            return files_info
+
+        except NotFoundError:
+            print(f"Error: Vector Store {vector_store_id} not found.")
+            return None
+        except APIError as e:
+            print(f"API Error listing files for vector store {vector_store_id}: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error listing files for vector store {vector_store_id}: {e}")
+            return None
+
+    def delete_vector_store_file(self, vector_store_id: str, file_id: str) -> bool:
+        """Deletes a file from a vector store and optionally the file object itself."""
+        try:
+            # Delete the file association from the vector store
+            deleted_vs_file = self.client.vector_stores.files.delete(
+                vector_store_id=vector_store_id,
+                file_id=file_id
+            )
+            if deleted_vs_file.deleted:
+                print(f"Successfully removed file {file_id} from vector store {vector_store_id}.")
+                # Optionally, delete the file object itself from OpenAI to free up storage
+                # Be cautious with this if the file might be used elsewhere.
+                try:
+                    deleted_file = self.client.files.delete(file_id=file_id)
+                    if deleted_file.deleted:
+                        print(f"Successfully deleted file object {file_id} from OpenAI.")
+                    else:
+                        print(
+                            f"Warning: Failed to delete file object {file_id} from OpenAI after removing from vector store.")
+                except NotFoundError:
+                    print(f"Warning: File object {file_id} not found for deletion after removing from vector store.")
+                except APIError as e:
+                    print(f"Warning: API Error deleting file object {file_id}: {e}")
+
+                return True  # Return True even if file object deletion failed, as it's removed from VS
+            else:
+                print(f"Failed to remove file {file_id} from vector store {vector_store_id}.")
+                return False
+
+        except NotFoundError:
+            print(f"Error: File {file_id} or Vector Store {vector_store_id} not found during deletion.")
+            return False
+        except APIError as e:
+            print(f"API Error deleting file {file_id} from vector store {vector_store_id}: {e}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error deleting file {file_id} from vector store {vector_store_id}: {e}")
+            return False
