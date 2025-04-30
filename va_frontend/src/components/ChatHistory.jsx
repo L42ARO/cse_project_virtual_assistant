@@ -1,35 +1,48 @@
 import React from "react";
-import "./ChatHistory.css"; // Import styles if needed
-
+import "./ChatHistory.css";
 
 const ChatHistory = ({ chatSessions, onSelectChat, selectedChat }) => {
+  // helper to parse either a number (seconds) or a string (ISO)
+  const parseDate = (ts) => {
+    if (ts == null) return null;
+    // if it's purely digits (or a number), treat as Unix seconds
+    if (typeof ts === "number" || /^\d+$/.test(ts)) {
+      const n = Number(ts);
+      // if it looks like seconds (e.g. <1e12), multiply; else assume ms
+      return new Date(n < 1e12 ? n * 1000 : n);
+    }
+    // otherwise assume an ISO date string
+    return new Date(ts);
+  };
+
   return (
     <div className="chat-history-container">
-
-      {/* Unordered list to show the chat items */}
       <ul className="chat-history-list">
-        {/* Check if there are any chat sessions to display */}
         {chatSessions.length > 0 ? (
-          // If there are chats, map through them and render each one
-          chatSessions.map((chat) => (
-            <li
-              key={chat.id} // Unique key for React to optimize rendering
-              className={`chat-history-item ${
-                selectedChat?.id === chat.id ? "selected" : ""
-              }`} // Add 'selected' class if this chat is currently selected
-              onClick={() => onSelectChat(chat)} // Handle chat selection when clicked
-            >
-              {/* Display course name and formatted timestamp */}
-              {chat.course} - {new Date(chat.timestamp).toLocaleString()}
-            </li>
-          ))
+          chatSessions.map((chat) => {
+            const dateObj = parseDate(chat.timestamp);
+            const label = dateObj && !isNaN(dateObj)
+              ? dateObj.toLocaleString()
+              : "Invalid Date";
+
+            return (
+              <li
+                key={chat.id}
+                className={`chat-history-item ${
+                  selectedChat?.id === chat.id ? "selected" : ""
+                }`}
+                onClick={() => onSelectChat(chat)}
+              >
+                {chat.course} – {label}
+              </li>
+            );
+          })
         ) : (
-          // If there are no chats, show a message
           <p className="no-chats">No previous chats</p>
         )}
       </ul>
     </div>
   );
 };
-  
+
 export default ChatHistory;
