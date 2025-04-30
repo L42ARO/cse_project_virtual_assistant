@@ -164,6 +164,10 @@ export const useAPI = () => {
     return await fetchAPI(`/pcc/ai-settings`, { method: 'PUT', body: JSON.stringify(payload) });
   }, [fetchAPI]); // Depends on fetchAPI
 
+  const getInsights = useCallback(async (courseId) => {
+    const payload = { course_id: courseId };
+    return await fetchAPI("/pcc/question-insights", { method: "POST", body: JSON.stringify(payload) });
+}, [fetchAPI]);
 
   // --- Memoize the returned object ---
   // This ensures the object reference itself is stable if the functions within are stable.
@@ -186,6 +190,7 @@ export const useAPI = () => {
     deleteCourseMaterial,
     getAiSettings,
     updateAiSettings,
+    getInsights,
   }), [ // List all memoized functions returned
     fetchHttpMessage,
     fetchDelayedHttpMessage,
@@ -205,5 +210,6 @@ export const useAPI = () => {
     deleteCourseMaterial,
     getAiSettings,
     updateAiSettings,
+    getInsights,
   ]);
 };

@@ -53,21 +53,14 @@ sessions = {}
 def get_question_insights():
     try:
         data = request.get_json()
-        token = data.get("token")
         course_id = data.get("course_id")
-
-        # Validate token and role (ensure it's a professor)
-        username = decode_token(token)
-        # Add role check here if needed, using your existing isProfessor logic
-        # from users_controller or similar mechanism
-        if not username: # or not isProfessor(username): # Add role check if needed
-            return http_response("Unauthorized", 401, error="Invalid token or insufficient permissions.")
 
         if not course_id:
             return http_response("Missing course_id", 400)
 
         # Fetch insights using the new service
         insights = questionReader.get_weekly_insights(course_id)
+        print(insights)
 
         return http_response(
             message="Weekly question insights retrieved successfully",

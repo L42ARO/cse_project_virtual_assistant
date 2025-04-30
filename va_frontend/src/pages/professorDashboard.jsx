@@ -19,6 +19,7 @@ function ProfessorDashboard() {
         deleteCourseMaterial, // Added
         getAiSettings,        // Added
         updateAiSettings,     // Added
+        getInsights,           // Added
         uploadFile            // Ensure uploadFile is available if needed directly
      } = useAPI();
 
@@ -284,20 +285,27 @@ function ProfessorDashboard() {
     }, [modalType, selectedCourse, getAiSettings]);
 
 
-    // Fetch Student Activity Insights (Placeholder)
+        // Fetch Student Activity Insights (Placeholder)
     useEffect(() => {
         const fetchInsights = async () => {
             if (modalType === "Student Activity" && selectedCourse) {
+                console.log("→ conditions met, calling API…");
                 setIsLoadingInsights(true);
                 setInsightData([]);
-                console.warn("API call for insights not implemented yet.");
-                // TODO: Call API: const response = await getInsights(selectedCourse, token);
-                // if(response?.data) { setInsightData(response.data); }
+
+                const response = await getInsights(selectedCourse);
+                if (response.data && Array.isArray(response.data)) {
+                  setInsightData(response.data);
+                } else {
+                  console.error("Failed to load insights:", response.error);
+                  // you might also set an error state here
+                }
+
                 setIsLoadingInsights(false);
             }
         };
         fetchInsights();
-    }, [modalType, selectedCourse]); // Add getInsights when implemented
+    }, [modalType, selectedCourse, getInsights]);  // Add getInsights when implemented
 
 
     // Fetch Notification Flags (Placeholder)
