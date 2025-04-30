@@ -1,7 +1,7 @@
 import traceback
 import uuid
 import os
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from flask_socketio import SocketIO
 from pydantic import ValidationError
 from models.pcc_course_new_req import *
@@ -14,6 +14,7 @@ from utils.utils import *
 from dotenv import load_dotenv
 from services.openai_service import *
 from services.question_logging_service import QuestionLoggingService
+from services.flagging_service import FlaggingService
 
 
 # Create a Blueprint
@@ -47,7 +48,30 @@ openai_course_assistants ={
 
 openAiService = OpenAIService(user_role="professor")
 questionReader = QuestionLoggingService() # Instantiate for reading insights
+flag_svc = FlaggingService()
 sessions = {}
+
+@bp.route(f"{prefix}/flagged-notifications", methods=["POST"])
+def get_notifications():
+    try:
+        data = request.get_json(force=True)
+        course_id = data.get("course_id")
+        if not course_id:
+            return http_response("Missing course_id", 400, error="course_id is required")
+
+        # Read both mandatory and voluntary (excluding already seen)
+        mandatory = flag_svc.read_flagged_questions(course_id, flag_type="mandatory", include_seen=False)
+        voluntary = flag_svc.read_flagged_questions(course_id, flag_type="voluntary", include_seen=False)
+
+        return jsonify({
+            "ok": True,
+            "data": {"mandatory": mandatory, "voluntary": voluntary}
+        }), 200
+    except Exception as e:
+        print(f"Error fetching notifications for {course_id}: {e}")
+        # import traceback
+        # traceback.print_exc()
+        return http_response("Internal server error", 500, error=str(e))
 
 @bp.route(f"{prefix}/question-insights", methods=["POST"])
 def get_question_insights():

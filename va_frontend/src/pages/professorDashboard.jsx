@@ -20,6 +20,7 @@ function ProfessorDashboard() {
         getAiSettings,        // Added
         updateAiSettings,     // Added
         getInsights,           // Added
+        getFlags,
         uploadFile            // Ensure uploadFile is available if needed directly
      } = useAPI();
 
@@ -310,18 +311,26 @@ function ProfessorDashboard() {
 
     // Fetch Notification Flags (Placeholder)
     useEffect(() => {
-        const fetchFlags = async () => {
-            if (modalType === "Notifications" && selectedCourse) {
-                 setIsLoadingFlags(true);
-                 setFlaggedData({ mandatory: [], voluntary: [] });
-                 console.warn("API call for flags not implemented yet.");
-                 // TODO: Call API: const response = await getFlags(selectedCourse, token);
-                 // if(response?.data) { setFlaggedData(response.data); } else { setFlaggedData({ mandatory: [], voluntary: [] }) }
-                 setIsLoadingFlags(false);
+      const fetchFlags = async () => {
+        if (modalType === "Notifications" && selectedCourse) {
+          setIsLoadingFlags(true);
+          try {
+            const response = await getFlags(selectedCourse);
+            if (response.ok && response.data) {
+              setFlaggedData(response.data);
+            } else {
+              console.error("Failed to fetch flags:", response.error);
+              setFlaggedData({ mandatory: [], voluntary: [] });
             }
-        };
-        fetchFlags();
-    }, [modalType, selectedCourse]); // Add getFlags when implemented
+          } catch (err) {
+            console.error(err);
+            setFlaggedData({ mandatory: [], voluntary: [] });
+          }
+          setIsLoadingFlags(false);
+        }
+      };
+      fetchFlags();
+    }, [modalType, selectedCourse, getFlags]);
 
 
     // --- Action Handlers ---

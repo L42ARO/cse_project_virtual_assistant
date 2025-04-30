@@ -117,5 +117,12 @@
     "username": "student1",
     "course_id": "CAP6317",
     "timestamp": "2025-04-24T09:08:54.359448"
+  },
+  {
+    "session_id": "216d5334-4002-47f3-b0f9-bf5cb8125cca",
+    "thread_id": "thread_yKnjveLzCTMyzlIDPNy9gJlI",
+    "username": "student1",
+    "course_id": "CAP6317",
+    "timestamp": "2025-04-30T09:50:10.596454"
   }
 ]
