@@ -111,26 +111,18 @@ function ProfessorDashboard() {
 
 
     // --- Chat Logic ---
-    const handleSendMessage = async () => {
-        if (!chatInput.trim() || !selectedCourse) return;
+ const handleSendMessage = async () => {
+        if (!chatInput.trim()) return;
+
         const token = localStorage.getItem("token");
-        if (!token) {
-            console.error("No token found");
-            // Redirect to login or show error
-            return;
-        }
-
         if (!hasSentInitialMessage) {
-            // Use pccChatStart from API service
-            const response = await pccChatStart(token, selectedCourse, chatInput); // Pass token as first arg if needed by backend
+            const response = await pccChatStart("user123", selectedCourse, chatInput, token);
 
-            if (response?.data?.session_id) {
+            if (response.data.session_id) {
                 setSessionId(response.data.session_id);
                 setHasSentInitialMessage(true);
-                // User message is echoed via WebSocket from backend in this flow
             } else {
-                console.error("Failed to start chat:", response?.error);
-                // Show error to user?
+                console.error("Failed to start chat:", response.error);
                 return;
             }
         } else {
@@ -138,15 +130,14 @@ function ProfessorDashboard() {
                 console.error("No session ID set. Cannot continue chat.");
                 return;
             }
-            // Use pccChatCont from API service (sends via WebSocket)
             pccChatCont(socket, sessionId, chatInput, token);
-            // User message is echoed via WebSocket from backend
         }
-        setChatInput(""); // Clear input after sending attempt
+
+        setChatInput("");
     };
 
     const handleKeyDown = (event) => {
-        if (event.key === "Enter" && !event.shiftKey) { // Allow Shift+Enter for new lines if needed
+        if (event.key === "Enter") {
             event.preventDefault();
             handleSendMessage();
         }
@@ -158,29 +149,30 @@ function ProfessorDashboard() {
             sender,
             timestamp: data.timestamp
         };
+
         setChatMessages((prev) => {
-            // Avoid adding duplicate messages if backend echoes user message
-            // This basic check might need refinement based on backend behavior
-            if(sender === "Professor" && prev.some(m => m.message === data.message && m.timestamp === data.timestamp)) {
-                return prev;
-            }
             const updatedMessages = [...prev, newMessage];
             return updatedMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         });
     };
 
-    // --- WebSocket Effects ---
     useEffect(() => {
         if (!socket) return;
 
         const handleAIResponse = (data) => {
             handleIncomingMessage(data, "AI");
             setLastAIMessageTimestamp(data.timestamp);
+
             if (lastStandbyTimestamp && new Date(data.timestamp) > new Date(lastStandbyTimestamp)) {
-                setLastStandbyTimestamp(null); // Clear standby if AI responds after
+                setLastStandbyTimestamp(null);
             }
         };
-        const handleUserResponse = (data) => handleIncomingMessage(data, "Professor"); // Backend echoes user msg
+
+        const handleUserResponse = (data) => {
+            handleIncomingMessage(data, "Professor");
+            setChatInput("");
+        };
+
         const handleStandby = (data) => {
             const standbyTime = new Date(data.timestamp);
             if (!lastAIMessageTimestamp || standbyTime > new Date(lastAIMessageTimestamp)) {
@@ -189,7 +181,7 @@ function ProfessorDashboard() {
         };
 
         socket.on("ws_pcc_ai_res", handleAIResponse);
-        socket.on("ws_pcc_user_res", handleUserResponse); // Listen for echoed user messages
+        socket.on("ws_pcc_user_res", handleUserResponse);
         socket.on("ws_pcc_ai_stdby", handleStandby);
 
         return () => {
@@ -197,47 +189,42 @@ function ProfessorDashboard() {
             socket.off("ws_pcc_user_res", handleUserResponse);
             socket.off("ws_pcc_ai_stdby", handleStandby);
         };
-    }, [socket, lastAIMessageTimestamp, lastStandbyTimestamp]); // Dependencies
+    }, [socket, lastAIMessageTimestamp, lastStandbyTimestamp]);
 
-
-    // Scroll chat box
     useEffect(() => {
         if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
     }, [chatMessages, lastStandbyTimestamp]);
 
-
-    // --- Course Change Effect ---
     useEffect(() => {
-        // Reset chat state
         setChatMessages([]);
         setHasSentInitialMessage(false);
         setChatInput("");
         setSessionId(null);
+        setCourseId(null);
         setLastStandbyTimestamp(null);
         setLastAIMessageTimestamp(null);
-
-        // Fetch Intro message if course selected
         if (selectedCourse && selectedCourse !== "Select a Course") {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found in localStorage for chat intro");
-                return;
-            }
-            // Use pccChatIntro from API service
-            pccChatIntro(selectedCourse, token)
-                .then((res) => {
-                    // Intro message is sent via WebSocket ('ws_pcc_ai_res'), no need to handle response here
-                    if (!res.ok) { // Check if fetch itself failed
-                        console.error("Chat intro request failed:", res.error);
-                    }
-                })
-                .catch((err) => {
-                    console.error("Error calling chat intro:", err);
-                });
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            console.error("No token found in localStorage");
+            return;
+          }
+
+          // Send the chat intro request
+          pccChatIntro(selectedCourse, token)
+            .then((res) => {
+              if (!res.ok) {
+                console.error("Intro message failed:", res.error);
+              }
+            })
+            .catch((err) => {
+              console.error("Error in chat intro:", err);
+            });
         }
-    }, [selectedCourse, pccChatIntro]); // Add pccChatIntro dependency
+    }, [selectedCourse, pccChatIntro]);
 
 
     // --- Data Fetching Effects ---
