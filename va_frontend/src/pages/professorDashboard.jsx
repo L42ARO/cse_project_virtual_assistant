@@ -30,8 +30,28 @@ function ProfessorDashboard() {
     const [sessionId, setSessionId] = useState(null);
     const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
     const [courseId, setCourseId] = useState(null); // This seems like a placeholder, selectedCourse is used mainly
-    const [professorCourses, setProfessorCourses] = useState(["CAP6317", "CDA4213"]); // Consider fetching this list too
-    const [selectedCourse, setSelectedCourse] = useState(professorCourses[0]);
+    const [professorCourses, setProfessorCourses] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState("");
+
+    // On mount: decode JWT and pull out the `courses` array
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setProfessorCourses(payload.courses || []);
+        } catch (err) {
+          console.error("Failed to parse token payload:", err);
+        }
+      }
+    }, []);
+
+    // Once `professorCourses` loads, default to the first one
+    useEffect(() => {
+      if (professorCourses.length > 0 && !selectedCourse) {
+        setSelectedCourse(professorCourses[0]);
+      }
+    }, [professorCourses, selectedCourse]);
     const [lastStandbyTimestamp, setLastStandbyTimestamp] = useState(null);
     const [lastAIMessageTimestamp, setLastAIMessageTimestamp] = useState(null);
     const [modalType, setModalType] = useState(null);
