@@ -34,6 +34,40 @@ sessions = {
 }
 # azureAiService = OpenAIService("AZURE_OPENAI_API_KEY_1", "AZURE_OPENAI_API_ENDPOINT")
 
+@bp.route(f"{prefix}/chat-history-search", methods=["POST"])
+def search_chat_history():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+        search_query = data.get("search_query")
+        if not token or not search_query:
+            return http_response("Missing token or search query", 400)
+
+        username = decode_token(token)
+        if not username:
+            return http_response("Unauthorized", 401, "Invalid or expired token")
+
+        # Search through the sessions for matching text
+        matching_sessions = []
+        for session_id, session_data in sessions.items():
+            # Retrieve messages for each session and filter based on the search query
+            history = openAiService.get_thread_messages(session_data["thread_id"])
+            filtered_history = [msg for msg in history if search_query.lower() in msg["message"].lower()]
+
+            if filtered_history:
+                matching_sessions.append({
+                    "session_id": session_id,
+                    "course_id": session_data["course_id"],
+                    "thread_id": session_data["thread_id"],
+                    "messages": filtered_history
+                })
+        print(matching_sessions)
+        return http_response("Search completed successfully", 200, data=matching_sessions)
+
+    except Exception as e:
+        return http_response("Internal server error", 500, error=str(e))
+
+
 @bp.route(f"{prefix}/sessions-get", methods=["POST"])
 def get_sessions():
     try:

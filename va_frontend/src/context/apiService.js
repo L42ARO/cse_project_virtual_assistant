@@ -178,6 +178,11 @@ export const useAPI = () => {
     );
   }, [fetchAPI]);
 
+  const sccChatHistorySearch = useCallback(async (token, searchQuery) => {
+    const payload = { token, search_query: searchQuery };
+    return await fetchAPI("/scc/chat-history-search", { method: "POST", body: JSON.stringify(payload) });
+}, [fetchAPI]);
+
   // --- Memoize the returned object ---
   // This ensures the object reference itself is stable if the functions within are stable.
   return useMemo(() => ({
@@ -188,6 +193,7 @@ export const useAPI = () => {
     sccChatCont,
     sccGetSessions,
     sccGetSessionMessages,
+    sccChatHistorySearch,
     pccChatIntro,
     pccChatStart,
     pccChatCont,
@@ -209,6 +215,7 @@ export const useAPI = () => {
     sccChatCont,
     sccGetSessions,
     sccGetSessionMessages,
+    sccChatHistorySearch,
     pccChatIntro,
     pccChatStart,
     pccChatCont,
