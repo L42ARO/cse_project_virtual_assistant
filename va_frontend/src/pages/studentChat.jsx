@@ -25,12 +25,32 @@ function StudentChat() {
   const [hasSentInitialMessage, setHasSentInitialMessage] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
-  // --- Course selection ---
-  const studentCourses = ["CAP6317", "CDA4213"];
-  const [selectedCourse, setSelectedCourse] = useState(studentCourses[0]);
+  // --- Course selection pulled from JWT ---
+  const [studentCourses, setStudentCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+
+  useEffect(() => {
+    // decode JWT payload to get courses array
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setStudentCourses(payload.courses || []);
+      } catch (err) {
+        console.error("Failed to parse token payload:", err);
+      }
+    }
+  }, []);
+
+  // initialize selectedCourse once we have the list
+  useEffect(() => {
+    if (studentCourses.length > 0 && !selectedCourse) {
+      setSelectedCourse(studentCourses[0]);
+    }
+  }, [studentCourses, selectedCourse]);
 
   // --- History & search state ---
-  const [allChats, setAllChats] = useState([]);          // master list
+  const [allChats, setAllChats] = useState([]);            // master list
   const [searchResults, setSearchResults] = useState(null); // null = no active search
 
   // --- Modal & query state ---
@@ -73,6 +93,8 @@ function StudentChat() {
 
   // --- Load all sessions when selectedCourse changes ---
   useEffect(() => {
+    if (!selectedCourse) return;
+
     const loadChatHistory = async () => {
       const token = localStorage.getItem("token");
       try {
@@ -85,7 +107,6 @@ function StudentChat() {
             thread_id: s.thread_id,
           }));
           setAllChats(sessions);
-          // clear any previous search results
           setSearchResults(null);
         }
       } catch (err) {
@@ -95,39 +116,35 @@ function StudentChat() {
     loadChatHistory();
   }, [selectedCourse, sccGetSessions]);
 
-      // --- Search effect: update searchResults (normalized) or clear if query is empty ---
-    useEffect(() => {
-      const doSearch = async () => {
-        const q = searchQuery.trim();
-        if (!q) {
-          setSearchResults(null);
-          return;
-        }
-        const token = localStorage.getItem("token");
-        try {
-          const result = await sccChatHistorySearch(token, q);
-          if (result.data) {
-            const normalized = result.data.map((s) => ({
-              id: s.session_id,
-              course_id: s.course_id,                  // for .filter(c => c.course_id === ...)
-              course: s.course_id,                     // for ChatHistory’s {chat.course}
-              timestamp: s.messages[0]?.timestamp,     // Unix seconds
-              thread_id: s.thread_id
-            }));
-            setSearchResults(normalized);
-          } else {
-            setSearchResults([]);
-          }
-        } catch (err) {
-          console.error("Failed to search chat history:", err);
+  // --- Search effect: update searchResults or clear if query empty ---
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults(null);
+      return;
+    }
+    const doSearch = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const result = await sccChatHistorySearch(token, searchQuery.trim());
+        if (result.data) {
+          const normalized = result.data.map((s) => ({
+            id: s.session_id,
+            course_id: s.course_id,
+            course: s.course_id,
+            timestamp: s.messages[0]?.timestamp,
+            thread_id: s.thread_id,
+          }));
+          setSearchResults(normalized);
+        } else {
           setSearchResults([]);
         }
-      };
-
-      doSearch();
-    }, [searchQuery, selectedCourse, sccChatHistorySearch]);
-
-
+      } catch (err) {
+        console.error("Failed to search chat history:", err);
+        setSearchResults([]);
+      }
+    };
+    doSearch();
+  }, [searchQuery, sccChatHistorySearch]);
 
   // --- Helper: decide which to display ---
   const displayedChats = searchResults !== null ? searchResults : allChats;
@@ -137,12 +154,7 @@ function StudentChat() {
     if (!chatInput.trim()) return;
     const token = localStorage.getItem("token");
     if (!hasSentInitialMessage) {
-      const response = await sccChatStart(
-        "user123",
-        selectedCourse,
-        chatInput,
-        token
-      );
+      const response = await sccChatStart("user123", selectedCourse, chatInput, token);
       if (response.data?.session_id) {
         setSessionId(response.data.session_id);
         setHasSentInitialMessage(true);
@@ -155,7 +167,6 @@ function StudentChat() {
   };
 
   useEffect(() => {
-    // auto-start / no-op on mount
     handleSendMessage();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -176,14 +187,10 @@ function StudentChat() {
 
   useEffect(() => {
     if (!socket) return;
-
     const onAI = (d) => {
       handleIncomingMessage(d, "AI");
       setLastAIMessageTimestamp(d.timestamp);
-      if (
-        lastStandbyTimestamp &&
-        new Date(d.timestamp) > new Date(lastStandbyTimestamp)
-      ) {
+      if (lastStandbyTimestamp && new Date(d.timestamp) > new Date(lastStandbyTimestamp)) {
         setLastStandbyTimestamp(null);
       }
     };
@@ -192,10 +199,7 @@ function StudentChat() {
       setChatInput("");
     };
     const onStandby = (d) => {
-      if (
-        !lastAIMessageTimestamp ||
-        new Date(d.timestamp) > new Date(lastAIMessageTimestamp)
-      ) {
+      if (!lastAIMessageTimestamp || new Date(d.timestamp) > new Date(lastAIMessageTimestamp)) {
         setLastStandbyTimestamp(d.timestamp);
       }
     };
@@ -265,7 +269,7 @@ function StudentChat() {
     const newChat = {
       id: newId,
       course_id: selectedCourse,
-      timestamp: Math.floor(Date.now() / 1000), // seconds
+      timestamp: Math.floor(Date.now() / 1000),
       thread_id: null,
     };
     setAllChats((prev) => [newChat, ...prev]);
@@ -279,8 +283,7 @@ function StudentChat() {
 
   const shouldShowStandby =
     lastStandbyTimestamp &&
-    (!lastAIMessageTimestamp ||
-      new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
+    (!lastAIMessageTimestamp || new Date(lastStandbyTimestamp) > new Date(lastAIMessageTimestamp));
 
   return (
     <div className="student-chat-container">
@@ -288,10 +291,7 @@ function StudentChat() {
         <div className="student-sidebar-content">
           <h2 className="student-sidebar-title">
             Chat History
-            <button
-              className="search-icon-button"
-              onClick={openSearchModal}
-            >
+            <button className="search-icon-button" onClick={openSearchModal}>
               🔍
             </button>
           </h2>
@@ -307,10 +307,7 @@ function StudentChat() {
           />
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="student-logout-button"
-        >
+        <button onClick={handleLogout} className="student-logout-button">
           ← Log out
         </button>
       </div>
@@ -329,16 +326,10 @@ function StudentChat() {
 
         <div className="student-chat-box" ref={chatBoxRef}>
           {chatMessages.map((msg, idx) => (
-            <ChatBubble
-              key={idx}
-              sender={msg.sender}
-              message={msg.message}
-            />
+            <ChatBubble key={idx} sender={msg.sender} message={msg.message} />
           ))}
 
-          {shouldShowStandby && (
-            <ChatBubble sender="AI" message="..." />
-          )}
+          {shouldShowStandby && <ChatBubble sender="AI" message="..." />}
         </div>
 
         <div className="student-input-container">
@@ -355,16 +346,10 @@ function StudentChat() {
 
       <div className="student-right-sidebar">
         <h2 className="student-sidebar-title">Flagged Questions</h2>
-        <FlaggedQuestionList
-          flaggedQuestions={filteredFlaggedQuestions}
-        />
+        <FlaggedQuestionList flaggedQuestions={filteredFlaggedQuestions} />
       </div>
 
-      <Modal
-        isOpen={isSearchModalOpen}
-        onClose={closeSearchModal}
-        title="Search Chats"
-      >
+      <Modal isOpen={isSearchModalOpen} onClose={closeSearchModal} title="Search Chats">
         <div className="search-modal-body">
           <input
             type="text"
