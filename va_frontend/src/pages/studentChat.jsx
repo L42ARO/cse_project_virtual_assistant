@@ -188,12 +188,55 @@ function StudentChat() {
   useEffect(() => {
     if (!socket) return;
     const onAI = (d) => {
-      handleIncomingMessage(d, "AI");
+      if (d.failed) {
+        console.error(d.details);
+        return;
+      }
+
+      setChatMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (d.partial) {
+          // Streaming chunk: update the last AI message
+          if (last && last.sender === "AI") {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              ...last,
+              message: last.message + d.message
+            };
+            return updated;
+          } else {
+            // First streaming chunk: add new AI message
+            return [
+              ...prev,
+              { message: d.message, sender: "AI", timestamp: d.timestamp }
+            ];
+          }
+        } else {
+          // Final non-streaming message: REPLACE last AI message
+          if (last && last.sender === "AI") {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              ...last,
+              message: d.message  // replace full text
+            };
+            return updated;
+          } else {
+            // If somehow no prior AI message, just add it
+            return [
+              ...prev,
+              { message: d.message, sender: "AI", timestamp: d.timestamp }
+            ];
+          }
+        }
+      });
+
+
       setLastAIMessageTimestamp(d.timestamp);
       if (lastStandbyTimestamp && new Date(d.timestamp) > new Date(lastStandbyTimestamp)) {
         setLastStandbyTimestamp(null);
       }
     };
+
     const onUser = (d) => {
       handleIncomingMessage(d, "User");
       setChatInput("");

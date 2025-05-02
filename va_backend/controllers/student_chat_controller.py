@@ -1,3 +1,4 @@
+import threading
 from flask import Blueprint, request
 from flask_socketio import SocketIO
 from pydantic import ValidationError
@@ -9,6 +10,36 @@ from datetime import datetime, timezone
 from utils.utils import *
 from services.openai_service import OpenAIService  # Import the OpenAI service
 from services.session_logging_service import *
+from services.question_logging_service import QuestionLoggingService
+
+from openai import AssistantEventHandler
+
+class WebSocketStreamingHandler(AssistantEventHandler):
+    def __init__(self, socketio, session_id):
+        super().__init__()
+        self.buffer = ""
+        self.socketio = socketio
+        self.session_id = session_id
+
+    def on_text_delta(self, delta, snapshot):
+        self.buffer += delta.value
+        self.socketio.emit("ws_scc_ai_res", {
+            "message": delta.value,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "session_id": self.session_id,
+            "partial": True
+        })
+
+    def on_text_done(self, text):
+        # Final chunk
+        self.socketio.emit("ws_scc_ai_res", {
+            "message": self.buffer,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "session_id": self.session_id,
+            "partial": False
+        })
+
+
 
 # Create a Blueprint
 socketio = None
@@ -149,9 +180,18 @@ def chat_start():
             thread_id = thread.id
             message = f"I am a student. {message}. Again this is a student message, not the professor. Remember you have access to the class files."
             openAiService.add_message(thread_id, message)
-            run = openAiService.run_thread(thread_id, assistant_id)
-            openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
-            ai_response = openAiService.get_latest_response(thread_id)
+            #run = openAiService.run_thread(thread_id, assistant_id)
+            #openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
+            #ai_response = openAiService.get_latest_response(thread_id)
+            def run_openai_stream():
+                handler = WebSocketStreamingHandler(socketio, session_id)
+                openAiService.run_thread(thread_id, assistant_id, stream=True, event_handler=handler)
+
+            threading.Thread(target=run_openai_stream).start()
+
+            # handler = WebSocketStreamingHandler(socketio, session_id)
+            # openAiService.run_thread(thread_id, assistant_id, stream=True, event_handler=handler)
+
         except Exception as e:
             ai_response = "AI Service is down"
             initFailed = True
@@ -162,8 +202,8 @@ def chat_start():
         sessionsService.log_session(session_id, thread_id, username, course_id)
         # Emit AI response to WebSocket
 
-        timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
-        socketio.emit("ws_scc_ai_res", {"message": ai_response, "timestamp": timestamp})
+        # timestamp = datetime.now(timezone.utc).isoformat()  # UTC timestamp in ISO format
+        # socketio.emit("ws_scc_ai_res", {"message": ai_response, "timestamp": timestamp})
 
         if initFailed:
             return http_response(
@@ -259,9 +299,15 @@ def register_socketio_events(_socketio: SocketIO):
             # ✅ AI logic
             message = f"I am a student. {message}. Again this is a student message, not the professor. Remember you have access to the class files."
             openAiService.add_message(thread_id, message)
-            run = openAiService.run_thread(thread_id, assistant_id)
-            openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
-            ai_response = openAiService.get_latest_response(thread_id)
+            handler = WebSocketStreamingHandler(socketio, session_id)
+            openAiService.run_thread(thread_id, assistant_id, stream=True, event_handler=handler)
+
+            # threading.Thread(target=run_openai_stream).start()
+            # run = openAiService.run_thread(thread_id, assistant_id)
+            # openAiService.wait_for_run(thread_id, run.id, assistant_id, course_id)
+
+            # ai_response = openAiService.get_latest_response(thread_id)
+            return
 
         except KeyError as e:
             ai_response = f"Invalid session data."

@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 from services.flagging_service import FlaggingService
 
+from openai import AssistantEventHandler
+
 fs = FlaggingService()
 
 load_dotenv()
@@ -111,15 +113,19 @@ class OpenAIService:
 
     def run_thread(self, thread_id, assistant_id, stream=False, event_handler=None):
         if stream:
-            return self.client.beta.threads.runs.stream(
+            with self.client.beta.threads.runs.stream(
                 thread_id=thread_id,
                 assistant_id=assistant_id,
                 event_handler=event_handler
+            ) as stream_runner:
+                stream_runner.until_done()
+            return  # streaming finished
+        else:
+            return self.client.beta.threads.runs.create(
+                thread_id=thread_id,
+                assistant_id=assistant_id
             )
-        return self.client.beta.threads.runs.create(
-            thread_id=thread_id,
-            assistant_id=assistant_id
-        )
+
 
     def wait_for_run(self, thread_id, run_id, assistant_id=None, course_id=None, poll_interval=1):
         print(f"L42: Waiting for run {run_id} on thread {thread_id}")
